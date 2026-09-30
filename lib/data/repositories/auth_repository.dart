@@ -1,0 +1,82 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../core/constant/firebase_constants.dart';
+import '../../core/exceptions/app_exception.dart';
+import '../models/user_model.dart';
+import '../services/auth_service.dart';
+import '../services/firestore_service.dart';
+
+class AuthRepository {
+  final AuthService _auth;
+  final FirestoreService _fs;
+
+  AuthRepository(this._auth, this._fs);
+
+  /// Admin account + hostel + private CNIC
+  Future<UserModel> registerAdmin({
+    required String ownerName,
+    required String email,
+    required String password,
+    required String phone,
+    required String cnic,
+    required String hostelName,
+    required String city,
+  }) async {
+    final cred = await _auth.signUp(email, password);
+    final uid = cred.user!.uid;
+
+    final user = UserModel(
+      uid: uid,
+      role: UserRole.admin,
+      name: ownerName,
+      email: email,
+      phone: phone,
+      hostelId: uid,
+      createdAt: DateTime.now(),
+    );
+
+    try {
+      final batch = _fs.batch();
+      batch.set(_fs.doc('${FirebaseConstants.users}/$uid'), user.toJson());
+      batch.set(
+        _fs.doc(
+            '${FirebaseConstants.users}/$uid/${FirebaseConstants.privateSubcollection}/${FirebaseConstants.kycDoc}'),
+        {'cnic': cnic},
+      );
+      batch.set(_fs.doc('${FirebaseConstants.hostels}/$uid'), {
+        'name': hostelName,
+        'city': city,
+        'adminId': uid,
+        'isActive': true,
+        'createdAt': Timestamp.now(),
+      });
+      await batch.commit();
+      return user;
+    } catch (_) {
+      await _auth.deleteCurrentUser();
+      rethrow;
+    }
+  }
+
+  Future<UserModel> loginAdmin(String email, String password) async {
+    final cred = await _auth.signIn(email, password);
+    final snap =
+    await _fs.getDoc('${FirebaseConstants.users}/${cred.user!.uid}');
+
+    if (!snap.exists) {
+      await _auth.signOut();
+      throw const AppException('Account not found. Please sign up.');
+    }
+
+    final user = UserModel.fromSnapshot(snap);
+    if (!user.isAdmin) {
+      await _auth.signOut();
+      throw const AppException('This is not a hostel admin account.');
+    }
+    return user;
+  }
+
+  Future<void> sendPasswordReset(String email) =>
+      _auth.sendPasswordReset(email);
+
+  Future<void> logout() => _auth.signOut();
+}

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "142343465677",
+    "project_id": "crib-x",
+    "storage_bucket": "crib-x.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:142343465677:android:9bd2e6af693482db6fd784",
+        "android_client_info": {
+          "package_name": "com.cribx.crib_x"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAqHX4BrmXD0b37KHF-nHWR7H5B8Tike6E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
