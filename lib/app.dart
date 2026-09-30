@@ -20,6 +20,6 @@ class App extends StatelessWidget {
       initialRoute: AppRoutes.adminLogin,
       getPages: AppPages.pages,
       builder: (context, child) => ConnectivityBanner(child: child!),
-    );
+    );//
   }
 }
