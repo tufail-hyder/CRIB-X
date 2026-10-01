@@ -116,8 +116,7 @@ class AdminSignupView extends GetView<SignupController> {
                           style: AppTextStyles.body),
                       GestureDetector(
                         onTap: Get.back,
-                        child: Text('login',
-                            style: AppTextStyles.oneLinerSemiBold),
+                        child: Text('Login', style: AppTextStyles.screenTitle),
                       ),
                     ],
                   ),

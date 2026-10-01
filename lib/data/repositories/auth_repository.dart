@@ -75,6 +75,19 @@ class AuthRepository {
     return user;
   }
 
+  bool get isLoggedIn => _auth.currentUser != null;
+
+  /// Logged-in user ka profile
+  Future<UserModel?> getCurrentUser() async {
+    final firebaseUser = _auth.currentUser;
+    if (firebaseUser == null) return null;
+
+    final snap =
+    await _fs.getDoc('${FirebaseConstants.users}/${firebaseUser.uid}');
+    if (!snap.exists) return null;
+    return UserModel.fromSnapshot(snap);
+  }
+
   Future<void> sendPasswordReset(String email) =>
       _auth.sendPasswordReset(email);
 

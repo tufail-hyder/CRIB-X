@@ -21,7 +21,7 @@ class AppSizes {
   static const double radiusFull = 100;
 
   // Components
-  static const double buttonHeight = 48;
+  static const double buttonHeight = 56;
   static const double inputHeight = 48;
   static const double appBarHeight = 56;
   static const double iconSm = 16;
