@@ -15,11 +15,10 @@ class InitialRouteResolver {
       await repo.getCurrentUser().timeout(const Duration(seconds: 8));
 
       if (user == null) {
-        await repo.logout(); // auth hai lekin profile nahi
+        await repo.logout();
         return AppRoutes.adminLogin;
       }
       if (user.isAdmin) return AppRoutes.adminDashboard;
-      // TODO: student screens banne par student route yahan aayega
     } catch (e, s) {
       AppLogger.e('Initial route check failed', e, s);
     }

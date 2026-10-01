@@ -17,6 +17,12 @@ class App extends StatelessWidget {
       theme: AppTheme.light,
       initialRoute: initialRoute,
       getPages: AppPages.pages,
+      unknownRoute: GetPage(
+        name: '/not-found',
+        page: () => const Scaffold(
+          body: Center(child: Text('Page not found')),
+        ),
+      ),
       builder: (context, child) => ConnectivityBanner(child: child!),
     );
   }

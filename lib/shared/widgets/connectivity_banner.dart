@@ -13,29 +13,46 @@ class ConnectivityBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final network = NetworkManager.instance;
-    return Column(
+
+    return Stack(
       children: [
-        Expanded(child: child),
-        Obx(() => AnimatedContainer(
-          duration: const Duration(milliseconds: 250),
-          height: network.isOnline.value ? 0 : 32,
-          width: double.infinity,
-          color: AppColors.error,
-          alignment: Alignment.center,
-          child: network.isOnline.value
-              ? const SizedBox.shrink()
-              : Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.wifi_off,
-                  size: AppSizes.iconSm, color: AppColors.white),
-              AppSizes.wSm,
-              Text(AppStrings.noInternetTitle,
-                style: AppTextStyles.smallSemiBold.copyWith(color: AppColors.white),
-              ),
-            ],
+        Positioned.fill(child: child), // app apni jagah par rehti hai
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          child: IgnorePointer(
+            child: Obx(() {
+              if (network.isOnline.value) return const SizedBox.shrink();
+              return SafeArea(
+                top: false,
+                child: Center(
+                  child: Material(
+                    color: AppColors.error,
+                    borderRadius: BorderRadius.circular(AppSizes.radiusFull),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: AppSizes.lg, vertical: AppSizes.sm),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.wifi_off,
+                              size: AppSizes.iconSm, color: AppColors.white),
+                          AppSizes.wSm,
+                          Text(
+                            AppStrings.noInternetTitle,
+                            style: AppTextStyles.smallSemiBold
+                                .copyWith(color: AppColors.white),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }),
           ),
-        )),
+        ),
       ],
     );
   }
