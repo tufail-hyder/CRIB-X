@@ -10,6 +10,7 @@ class AuthRepository {
   final FirestoreService _fs;
 
   AuthRepository(this._auth, this._fs);
+  String? get currentUid => _auth.currentUser?.uid;
 
   /// Admin account + hostel + private CNIC
   Future<UserModel> registerAdmin({
@@ -92,4 +93,5 @@ class AuthRepository {
       _auth.sendPasswordReset(email);
 
   Future<void> logout() => _auth.signOut();
+
 }

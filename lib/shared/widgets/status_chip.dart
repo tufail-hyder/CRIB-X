@@ -6,12 +6,17 @@ import '../../core/theme/app_text_styles.dart';
 class StatusChip extends StatelessWidget {
   final String text;
   final Color color;
+  final double? width;
 
-  const StatusChip({super.key, required this.text, required this.color});
+  const StatusChip({
+    super.key,
+    required this.text,
+    required this.color,
+    this.width,
+  });
 
-  factory StatusChip.fromStatus(String status) {
-    return StatusChip(text: status, color: colorFor(status));
-  }
+  factory StatusChip.fromStatus(String status, {double? width}) =>
+      StatusChip(text: status, color: colorFor(status), width: width);
 
   static Color colorFor(String status) {
     switch (status.toLowerCase()) {
@@ -39,6 +44,8 @@ class StatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: width,
+      alignment: width != null ? Alignment.center : null,
       padding: const EdgeInsets.symmetric(
           horizontal: AppSizes.md, vertical: AppSizes.xs + 1),
       decoration: BoxDecoration(
@@ -47,8 +54,8 @@ class StatusChip extends StatelessWidget {
       ),
       child: Text(
         text,
-        style: AppTextStyles.extraSmallSemiBold
-            .copyWith(color: AppColors.white),
+        style:
+        AppTextStyles.extraSmallSemiBold.copyWith(color: AppColors.white),
       ),
     );
   }

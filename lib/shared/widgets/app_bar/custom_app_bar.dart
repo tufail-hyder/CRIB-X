@@ -7,6 +7,7 @@ import '../../../core/theme/app_text_styles.dart';
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final bool showBack;
+  final Widget? leading;
   final List<Widget> actions;
   final VoidCallback? onBack;
 
@@ -14,6 +15,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     super.key,
     required this.title,
     this.showBack = false,
+    this.leading,
     this.actions = const [],
     this.onBack,
   });
@@ -26,14 +28,15 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       automaticallyImplyLeading: false,
       backgroundColor: AppColors.white,
-      titleSpacing: AppSizes.screenPadding,
-      leading: showBack
-          ? IconButton(
-        icon: const Icon(Icons.arrow_back_ios_new_rounded,
-            size: AppSizes.iconMd),
-        onPressed: onBack ?? () => Get.back(),
-      )
-          : null,
+      titleSpacing: (leading != null || showBack) ? 0 : AppSizes.screenPadding,
+      leading: leading ??
+          (showBack
+              ? IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new_rounded,
+                size: AppSizes.iconMd),
+            onPressed: onBack ?? () => Get.back(),
+          )
+              : null),
       title: Text(title, style: AppTextStyles.sectionTitle),
       actions: [
         ...actions,
