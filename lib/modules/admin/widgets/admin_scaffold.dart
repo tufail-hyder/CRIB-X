@@ -8,6 +8,7 @@ class AdminScaffold extends StatefulWidget {
   final Widget body;
   final List<Widget> actions;
   final Widget? floatingActionButton;
+  final Widget? bottomBar;
 
   const AdminScaffold({
     super.key,
@@ -15,6 +16,7 @@ class AdminScaffold extends StatefulWidget {
     required this.body,
     this.actions = const [],
     this.floatingActionButton,
+    this.bottomBar,
   });
 
   @override
@@ -24,9 +26,11 @@ class AdminScaffold extends StatefulWidget {
 class _AdminScaffoldState extends State<AdminScaffold> {
   final _key = GlobalKey<ScaffoldState>();
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      bottomNavigationBar: widget.bottomBar,
       key: _key,
       backgroundColor: AppColors.scaffoldBg,
       appBar: CustomAppBar(
