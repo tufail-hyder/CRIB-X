@@ -18,20 +18,39 @@ class CloudinaryService {
       throw const AppException('Image upload is not configured.');
     }
 
-    final form = FormData.fromMap({
-      'file': await MultipartFile.fromFile(file.path),
-      'upload_preset': _preset,
-    });
+    try {
+      final form = FormData.fromMap({
+        'file': await MultipartFile.fromFile(file.path),
+        'upload_preset': _preset,
+      });
 
-    final res = await _dio.post(
-      'https://api.cloudinary.com/v1_1/$_cloudName/image/upload',
-      data: form,
-    );
+      final res = await _dio.post(
+        'https://api.cloudinary.com/v1_1/$_cloudName/image/upload',
+        data: form,
+      );
 
-    final url = res.data['secure_url'] as String?;
-    if (url == null || url.isEmpty) {
-      throw const AppException('Image upload failed. Please try again.');
+      final body = res.data;
+      final url = body is Map ? body['secure_url']?.toString() : null;
+
+      if (url == null || url.isEmpty) {
+        throw const AppException('Image upload failed. Please try again.');
+      }
+      return url;
+    } on DioException catch (e) {
+      final data = e.response?.data;
+      String? message;
+
+      if (data is Map) {
+        final error = data['error'];
+        if (error is Map) {
+          message = error['message']?.toString();
+        }
+      }
+
+      if (message != null && message.isNotEmpty) {
+        throw AppException('Upload failed: $message');
+      }
+      rethrow;
     }
-    return url;
   }
 }
