@@ -16,4 +16,5 @@ class AppRoutes {
   static const roomForm = '/room-form';
   static const studentForm = '/student-form';
   static const bookingForm = '/booking-form';
+  static const paymentForm = '/payment-form';
 }

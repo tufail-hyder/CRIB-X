@@ -1,8 +1,12 @@
-/// 'Jan 10 2022' format
-String dateText(DateTime d) {
-  const m = [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-  ];
-  return '${m[d.month - 1]} ${d.day} ${d.year}';
-}
+const _months = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+];
+
+String dateText(DateTime d) =>
+    '${_months[d.month - 1].substring(0, 3)} ${d.day} ${d.year}';
+
+String monthText(DateTime d) => '${_months[d.month - 1]} ${d.year}';
+
+
+String monthShort(DateTime d) => _months[d.month - 1].substring(0, 3);

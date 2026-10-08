@@ -5,6 +5,9 @@ import '../../modules/admin/bookings/views/booking_form_view.dart';
 import '../../modules/admin/bookings/views/booking_views.dart';
 import '../../modules/admin/dashboard/views/dashboard_view.dart';
 import '../../modules/admin/hostel_profile/views/hostel_profile_view.dart';
+import '../../modules/admin/payments/bindings/payment_binding.dart';
+import '../../modules/admin/payments/views/payment_form_view.dart';
+import '../../modules/admin/payments/views/payments_view.dart';
 import '../../modules/admin/rooms/bindings/rooms_binding.dart';
 import '../../modules/admin/rooms/views/add_room_view.dart';
 import '../../modules/admin/rooms/views/rooms_view.dart';
@@ -81,6 +84,16 @@ class AppPages {
       page: () => const BookingFormView(),
       binding: BookingFormBinding(),
     ),
+  GetPage(
+  name: AppRoutes.adminPayments,
+  page: () => const PaymentsView(),
+  binding: PaymentsBinding(),
+   ),
+  GetPage(
+  name: AppRoutes.paymentForm,
+  page: () => const PaymentFormView(),
+  binding: PaymentFormBinding(),
+   ),
 
     ...adminMenu
         .where((m) => !_implemented.contains(m.route))
