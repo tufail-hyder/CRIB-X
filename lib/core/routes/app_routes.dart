@@ -13,4 +13,5 @@ class AppRoutes {
   static const adminSubscription = '/admin/subscription';
   static const adminReports = '/admin/reports';
   static const adminSettings = '/admin/settings';
+  static const roomForm = '/room-form';
 }

@@ -16,7 +16,7 @@ class ConnectivityBanner extends StatelessWidget {
 
     return Stack(
       children: [
-        Positioned.fill(child: child), // app apni jagah par rehti hai
+        Positioned.fill(child: child),
         Positioned(
           left: 0,
           right: 0,
