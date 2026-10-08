@@ -15,4 +15,5 @@ class AppRoutes {
   static const adminSettings = '/admin/settings';
   static const roomForm = '/room-form';
   static const studentForm = '/student-form';
+  static const bookingForm = '/booking-form';
 }

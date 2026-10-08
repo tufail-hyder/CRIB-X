@@ -1,5 +1,8 @@
 import 'package:crib_x/modules/auth/views/admin_signup_view.dart';
 import 'package:get/get.dart';
+import '../../modules/admin/bookings/bindings/booking_bindind.dart';
+import '../../modules/admin/bookings/views/booking_form_view.dart';
+import '../../modules/admin/bookings/views/booking_views.dart';
 import '../../modules/admin/dashboard/views/dashboard_view.dart';
 import '../../modules/admin/hostel_profile/views/hostel_profile_view.dart';
 import '../../modules/admin/rooms/bindings/rooms_binding.dart';
@@ -19,12 +22,12 @@ import 'app_routes.dart';
 class AppPages {
   AppPages._();
 
-  /// Jo screens ban chuki hain, wo "Coming soon" se overwrite nahi hongi.
   static final _implemented = {
     AppRoutes.adminDashboard,
     AppRoutes.adminHostelProfile,
     AppRoutes.adminRooms,
     AppRoutes.adminStudents,
+    AppRoutes.adminBookings,
   };
 
   static final pages = <GetPage>[
@@ -67,6 +70,16 @@ class AppPages {
       name: AppRoutes.studentForm,
       page: () => const StudentFormView(),
       binding: StudentFormBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.adminBookings,
+      page: () => const BookingsView(),
+      binding: BookingsBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.bookingForm,
+      page: () => const BookingFormView(),
+      binding: BookingFormBinding(),
     ),
 
     ...adminMenu
