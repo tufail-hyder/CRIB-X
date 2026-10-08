@@ -116,7 +116,7 @@ class RoomsView extends GetView<RoomsController> {
             else
               ...list.map((room) => Padding(
                 padding: const EdgeInsets.only(bottom: AppSizes.md),
-                child: RoomCard(room: room, onAction: (a) => c.onAction(room, a)),
+                child: RoomCard(room: room, onEdit: () => c.openEdit(room)),
               )),
           ],
         );

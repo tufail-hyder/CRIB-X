@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import '../../data/repositories/auth_repository.dart';
 import '../../data/repositories/hostel_repository.dart';
 import '../../data/repositories/room_repository.dart'; // <- add
+import '../../data/repositories/student_repository.dart';
 import '../../data/services/auth_service.dart';
 import '../../data/services/cloudinary_service.dart';
 import '../../data/services/firestore_service.dart';
@@ -18,5 +19,6 @@ class DependencyInjection {
     Get.put(CloudinaryService(), permanent: true);
     Get.put(HostelRepository(Get.find<FirestoreService>(), Get.find<CloudinaryService>()), permanent: true,);
     Get.put(RoomRepository(Get.find<FirestoreService>()), permanent: true);
+    Get.put(StudentRepository(Get.find<FirestoreService>()), permanent: true);
   }
 }

@@ -4,7 +4,6 @@ import '../../core/exceptions/app_exception.dart';
 import '../models/room_model.dart';
 import '../services/firestore_service.dart';
 
-/// Path: hostels/{hostelId}/rooms/{roomId}
 class RoomRepository {
   final FirestoreService _fs;
   RoomRepository(this._fs);
@@ -14,10 +13,7 @@ class RoomRepository {
 
   Stream<List<RoomModel>> watchRooms(String hostelId) {
     return _col(hostelId).orderBy('roomNumber').snapshots().map(
-          (snap) => snap.docs
-          .map((d) => RoomModel.fromSnapshot(
-          d as DocumentSnapshot<Map<String, dynamic>>))
-          .toList(),
+          (snap) => snap.docs.map(RoomModel.fromSnapshot).toList(),
     );
   }
 
@@ -34,6 +30,8 @@ class RoomRepository {
     await _ensureUnique(room.hostelId, room.roomNumber);
     await _col(room.hostelId).add({
       ...room.toJson(),
+      'occupiedBeds': 0,
+      'occupiedBedLabels': <String>[],
       'createdAt': Timestamp.now(),
     });
   }

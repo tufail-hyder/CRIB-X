@@ -19,9 +19,11 @@ class RoomModel {
   final String roomNumber;
   final int seater;
   final int totalBeds;
-  final int occupiedBeds;
-  final double monthlyPrice;
 
+  final int occupiedBeds;
+  final List<String> occupiedBedLabels;
+
+  final double monthlyPrice;
   final RoomStatus status;
   final DateTime? createdAt;
 
@@ -32,6 +34,7 @@ class RoomModel {
     required this.seater,
     required this.totalBeds,
     this.occupiedBeds = 0,
+    this.occupiedBedLabels = const [],
     required this.monthlyPrice,
     this.status = RoomStatus.available,
     this.createdAt,
@@ -49,6 +52,7 @@ class RoomModel {
       seater: (json['seater'] as num?)?.toInt() ?? 1,
       totalBeds: (json['totalBeds'] as num?)?.toInt() ?? 1,
       occupiedBeds: (json['occupiedBeds'] as num?)?.toInt() ?? 0,
+      occupiedBedLabels: List<String>.from(json['occupiedBedLabels'] ?? []),
       monthlyPrice: (json['monthlyPrice'] as num?)?.toDouble() ?? 0,
       status: RoomStatus.fromString(json['status']),
       createdAt: created is Timestamp ? created.toDate() : null,
@@ -60,7 +64,6 @@ class RoomModel {
     'roomNumber': roomNumber,
     'seater': seater,
     'totalBeds': totalBeds,
-    'occupiedBeds': occupiedBeds,
     'monthlyPrice': monthlyPrice,
     'status': status.name,
     'updatedAt': Timestamp.now(),
@@ -74,4 +77,9 @@ class RoomModel {
   int get availableBeds => status == RoomStatus.reserved
       ? 0
       : (totalBeds - occupiedBeds).clamp(0, totalBeds).toInt();
+
+  List<String> get freeBedLabels => [
+    for (var i = 1; i <= totalBeds; i++)
+      if (!occupiedBedLabels.contains('A$i')) 'A$i',
+  ];
 }

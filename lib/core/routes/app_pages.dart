@@ -5,6 +5,9 @@ import '../../modules/admin/hostel_profile/views/hostel_profile_view.dart';
 import '../../modules/admin/rooms/bindings/rooms_binding.dart';
 import '../../modules/admin/rooms/views/add_room_view.dart';
 import '../../modules/admin/rooms/views/rooms_view.dart';
+import '../../modules/admin/students/bindings/student_binding.dart';
+import '../../modules/admin/students/views/student_form_view.dart';
+import '../../modules/admin/students/views/student_view.dart';
 import '../../modules/admin/widgets/admin_menu.dart';
 import '../../modules/admin/widgets/coming_soon_view.dart';
 import '../../modules/auth/bindings/auth_binding.dart';
@@ -16,10 +19,12 @@ import 'app_routes.dart';
 class AppPages {
   AppPages._();
 
+  /// Jo screens ban chuki hain, wo "Coming soon" se overwrite nahi hongi.
   static final _implemented = {
     AppRoutes.adminDashboard,
     AppRoutes.adminHostelProfile,
     AppRoutes.adminRooms,
+    AppRoutes.adminStudents,
   };
 
   static final pages = <GetPage>[
@@ -52,6 +57,16 @@ class AppPages {
       name: AppRoutes.roomForm,
       page: () => const RoomFormView(),
       binding: RoomFormBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.adminStudents,
+      page: () => const StudentsView(),
+      binding: StudentsBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.studentForm,
+      page: () => const StudentFormView(),
+      binding: StudentFormBinding(),
     ),
 
     ...adminMenu

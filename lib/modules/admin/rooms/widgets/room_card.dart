@@ -5,12 +5,11 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../data/models/room_model.dart';
 import '../../../../shared/widgets/buttons/primary_button.dart';
-import 'student_actions_menu.dart';
 
 class RoomCard extends StatelessWidget {
   final RoomModel room;
-  final ValueChanged<StudentAction> onAction;
-  const RoomCard({super.key, required this.room, required this.onAction});
+  final VoidCallback onEdit;
+  const RoomCard({super.key, required this.room, required this.onEdit});
 
   Color get _statusColor {
     switch (room.displayStatus) {
@@ -73,15 +72,7 @@ class RoomCard extends StatelessWidget {
           Text('${Formatters.currency(room.monthlyPrice)}/month',
               style: AppTextStyles.oneLinerSemiBold),
           const _Line(),
-          Builder(
-            builder: (btnContext) => PrimaryButton(
-              text: 'Edit',
-              onPressed: () => StudentActionsMenu.show(
-                btnContext,
-                onSelected: onAction,
-              ),
-            ),
-          ),
+          PrimaryButton(text: 'Edit', onPressed: onEdit),
         ],
       ),
     );

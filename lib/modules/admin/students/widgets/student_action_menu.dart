@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../../../../core/constant/app_colors.dart';
 import '../../../../core/constant/app_sizes.dart';
 import '../../../../core/theme/app_text_styles.dart';
 
@@ -18,18 +20,17 @@ class StudentActionsMenu {
     final topLeft = box.localToGlobal(Offset.zero, ancestor: overlay);
     final position = RelativeRect.fromRect(
       Rect.fromLTWH(
-        topLeft.dx + box.size.width * 0.35,
-        topLeft.dy + box.size.height,
-        0,
-        0,
-      ),
+          topLeft.dx + box.size.width * 0.35,
+          topLeft.dy + box.size.height,
+          0,
+          0),
       Offset.zero & overlay.size,
     );
 
     final result = await showMenu<StudentAction>(
       context: context,
       position: position,
-      color: Colors.white,
+      color: AppColors.white,
       elevation: 6,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSizes.radiusMd),

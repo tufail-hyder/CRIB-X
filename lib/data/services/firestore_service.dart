@@ -12,4 +12,7 @@ class FirestoreService {
 
   Future<DocumentSnapshot<Map<String, dynamic>>> getDoc(String path) =>
       _db.doc(path).get();
+
+  Future<T> runTransaction<T>(TransactionHandler<T> handler) =>
+      _db.runTransaction(handler);
 }
