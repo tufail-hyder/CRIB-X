@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/exceptions/exception_handler.dart';
 import '../../../../core/network/network_manager.dart';
@@ -21,9 +20,9 @@ class StudentsController extends GetxController {
   StudentsController(this._repo, this._roomRepo, this._auth);
 
   final students = <StudentModel>[].obs;
-  final rooms = <RoomModel>[].obs;
+  final rooms = <RoomModel>[].obs; // sirf Room Number filter ke liye
 
-  final roomFilter = RxnString();
+  final roomFilter = RxnString(); // roomId
   final paymentFilter = Rxn<PaymentStatus>();
   final stayFilter = Rxn<StayStatus>();
 
@@ -97,38 +96,22 @@ class StudentsController extends GetxController {
       case StudentAction.viewProfile:
         Get.dialog(StudentDetailsDialog(student: student));
         break;
+
       case StudentAction.updateStatus:
-        await _updatePaymentStatus(student);
+        if (!student.isActive) {
+          AppSnackbar.info('${student.name} has already left.');
+          return;
+        }
+        Get.toNamed(AppRoutes.paymentForm, arguments: student);
         break;
+
       case StudentAction.paymentHistory:
         AppSnackbar.info('Payment history will be available soon.');
         break;
+
       case StudentAction.markResolved:
         await _checkOut(student);
         break;
-    }
-  }
-
-  Future<void> _updatePaymentStatus(StudentModel s) async {
-    final picked = await Get.dialog<PaymentStatus>(
-      SimpleDialog(
-        title: const Text('Update payment status'),
-        children: PaymentStatus.values
-            .map((p) => SimpleDialogOption(
-          onPressed: () => Get.back(result: p),
-          child: Text(p.label),
-        ))
-            .toList(),
-      ),
-    );
-    if (picked == null || picked == s.paymentStatus) return;
-
-    try {
-      await NetworkManager.instance.ensureConnected();
-      await _repo.updatePaymentStatus(s.hostelId, s.id, picked);
-      AppSnackbar.success('${s.name} marked as ${picked.label}');
-    } catch (e, st) {
-      AppSnackbar.error(ExceptionHandler.message(e, st));
     }
   }
 
@@ -137,10 +120,17 @@ class StudentsController extends GetxController {
       AppSnackbar.info('${s.name} has already left.');
       return;
     }
+
+    final key = StudentModel.monthKey(DateTime.now());
+    final remaining = s.remainingFor(key);
+    final dueNote = remaining > 0
+        ? '\n\nNote: ${remaining.toStringAsFixed(0)} is still unpaid for this month.'
+        : '';
+
     final ok = await AppDialogs.confirm(
       title: 'Mark as resolved?',
       message:
-      '${s.name} will be checked out and bed ${s.bed} in Room ${s.roomNumber} will be freed.',
+      '${s.name} will be checked out and bed ${s.bed} in Room ${s.roomNumber} will be freed.$dueNote',
       confirmText: 'Confirm',
     );
     if (ok != true) return;

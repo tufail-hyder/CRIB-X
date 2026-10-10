@@ -8,7 +8,7 @@ import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/shimmer_loader.dart';
 import '../../widgets/admin_scaffold.dart';
 import '../../widgets/analytics_donut.dart';
-import '../../widgets/monthly_income_chart.dart';
+import '../../payments/widgets/monthly_income_chart.dart';
 import '../../widgets/recent_students_card.dart';
 import '../controllers/dashboard_controller.dart';
 import '../../../../core/constant/app_colors.dart';

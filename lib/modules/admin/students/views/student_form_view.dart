@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import '../../../../core/constant/app_colors.dart';
 import '../../../../core/constant/app_sizes.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/validators.dart';
-import '../../../../data/models/student_model.dart';
+import '../../../../data/models/payment_model.dart';
 import '../../../../shared/widgets/buttons/primary_button.dart';
 import '../../../../shared/widgets/cards/section_card.dart';
 import '../../../../shared/widgets/inputs/custom_text_field.dart';
@@ -146,19 +147,38 @@ class StudentFormView extends GetView<StudentFormController> {
                           size: AppSizes.iconMd, color: AppColors.inputIcon),
                     ),
                     AppSizes.hMd,
-                    Text('Payment Status', style: AppTextStyles.label),
+                    CustomTextField(
+                      label: 'Monthly Fee',
+                      hint: 'e.g. 15000',
+                      controller: c.feeCtrl,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      validator: c.validateFee,
+                    ),
+                    AppSizes.hMd,
+                    CustomTextField(
+                      label: 'Amount Paid Now (optional)',
+                      hint: '0',
+                      controller: c.paidCtrl,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      textInputAction: TextInputAction.done,
+                      validator: c.validatePaid,
+                    ),
+                    AppSizes.hMd,
+                    Text('Payment Method', style: AppTextStyles.label),
                     AppSizes.hSm,
-                    DropdownButtonFormField<PaymentStatus>(
-                      value: c.paymentStatus.value,
+                    DropdownButtonFormField<PaymentMethod>(
+                      value: c.method.value,
                       isExpanded: true,
                       style: AppTextStyles.oneLinerRegular
                           .copyWith(color: Colors.black),
-                      items: PaymentStatus.values
-                          .map((p) =>
-                          DropdownMenuItem(value: p, child: Text(p.label)))
+                      items: PaymentMethod.values
+                          .map((m) =>
+                          DropdownMenuItem(value: m, child: Text(m.label)))
                           .toList(),
                       onChanged: (v) {
-                        if (v != null) c.paymentStatus.value = v;
+                        if (v != null) c.method.value = v;
                       },
                     ),
                   ],

@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import '../../../../core/constant/date_text.dart';
 import '../../../../core/exceptions/exception_handler.dart';
 import '../../../../core/network/network_manager.dart';
+import '../../../../core/utils/validators.dart';
+import '../../../../data/models/payment_model.dart';
 import '../../../../data/models/room_model.dart';
 import '../../../../data/models/student_model.dart';
 import '../../../../data/repositories/auth_repository.dart';
@@ -21,6 +23,8 @@ class StudentFormController extends GetxController {
   final phoneCtrl = TextEditingController();
   final cnicCtrl = TextEditingController();
   final dateCtrl = TextEditingController();
+  final feeCtrl = TextEditingController();
+  final paidCtrl = TextEditingController();
 
   final rooms = <RoomModel>[].obs; // sirf jinme bed khali ho
   final isLoadingRooms = true.obs;
@@ -29,7 +33,7 @@ class StudentFormController extends GetxController {
   final selectedRoomId = RxnString();
   final selectedBed = RxnString();
   final checkIn = DateTime.now().obs;
-  final paymentStatus = PaymentStatus.pending.obs;
+  final method = PaymentMethod.cash.obs;
 
   RoomModel? get selectedRoom =>
       rooms.firstWhereOrNull((r) => r.id == selectedRoomId.value);
@@ -57,6 +61,8 @@ class StudentFormController extends GetxController {
   void onRoomChanged(String? id) {
     selectedRoomId.value = id;
     selectedBed.value = null;
+    final room = selectedRoom;
+    if (room != null) feeCtrl.text = room.monthlyPrice.toStringAsFixed(0);
   }
 
   Future<void> pickDate() async {
@@ -71,6 +77,18 @@ class StudentFormController extends GetxController {
     dateCtrl.text = dateText(picked);
   }
 
+  String? validateFee(String? v) => Validators.positiveNumber(v, 'Monthly fee');
+
+  String? validatePaid(String? v) {
+    final t = (v ?? '').trim();
+    if (t.isEmpty) return null;
+    final n = double.tryParse(t);
+    if (n == null || n < 0) return 'Enter a valid amount';
+    final fee = double.tryParse(feeCtrl.text.trim()) ?? 0;
+    if (n > fee) return 'Cannot be more than the monthly fee';
+    return null;
+  }
+
   Future<void> save() async {
     if (!formKey.currentState!.validate()) return;
     final room = selectedRoom;
@@ -82,18 +100,24 @@ class StudentFormController extends GetxController {
       await NetworkManager.instance.ensureConnected();
 
       final cnic = cnicCtrl.text.trim();
-      await _repo.addStudent(StudentModel(
-        id: '',
-        hostelId: _auth.currentUid ?? '',
-        name: nameCtrl.text.trim(),
-        phone: phoneCtrl.text.trim(),
-        cnic: cnic.isEmpty ? null : cnic,
-        roomId: room.id,
-        roomNumber: room.roomNumber,
-        bed: bed,
-        checkInDate: checkIn.value,
-        paymentStatus: paymentStatus.value,
-      ));
+      final paid = double.tryParse(paidCtrl.text.trim()) ?? 0;
+
+      await _repo.addStudent(
+        StudentModel(
+          id: '',
+          hostelId: _auth.currentUid ?? '',
+          name: nameCtrl.text.trim(),
+          phone: phoneCtrl.text.trim(),
+          cnic: cnic.isEmpty ? null : cnic,
+          roomId: room.id,
+          roomNumber: room.roomNumber,
+          bed: bed,
+          checkInDate: checkIn.value,
+          monthlyFee: double.parse(feeCtrl.text.trim()),
+        ),
+        initialPaid: paid,
+        method: method.value,
+      );
 
       Get.back();
       AppSnackbar.success('Student added to Room ${room.roomNumber} ($bed)');
@@ -110,6 +134,8 @@ class StudentFormController extends GetxController {
     phoneCtrl.dispose();
     cnicCtrl.dispose();
     dateCtrl.dispose();
+    feeCtrl.dispose();
+    paidCtrl.dispose();
     super.onClose();
   }
 }

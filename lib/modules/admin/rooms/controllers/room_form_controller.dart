@@ -1,13 +1,16 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/exceptions/exception_handler.dart';
 import '../../../../core/network/network_manager.dart';
+import '../../../../core/utils/validators.dart';
 import '../../../../data/models/room_model.dart';
 import '../../../../data/repositories/auth_repository.dart';
 import '../../../../data/repositories/room_repository.dart';
 import '../../../../shared/popups/app_dialogs.dart';
 import '../../../../shared/popups/app_snackbar.dart';
 
+/// Add aur Edit dono ke liye. Edit me Get.arguments me RoomModel aata hai.
 class RoomFormController extends GetxController {
   final RoomRepository _repo;
   final AuthRepository _auth;
@@ -45,16 +48,41 @@ class RoomFormController extends GetxController {
     bedsCtrl.text = '$v'; // default: beds = seater
   }
 
+  /// Students ke record me room number copy hota hai, isliye jab tak koi
+  /// rehta hai tab tak rename nahi.
+  String? validateNumber(String? v) {
+    final err = Validators.required(v, 'Room number');
+    if (err != null) return err;
+    final e = _editing;
+    if (e != null && e.occupiedBeds > 0 && v!.trim() != e.roomNumber) {
+      return 'Cannot rename a room while students are living in it';
+    }
+    return null;
+  }
+
+  /// Total beds us bed se kam nahi ho sakte jo bhara hua hai (A3 bhara ho to min 3).
   String? validateBeds(String? v) {
     final n = int.tryParse((v ?? '').trim());
     if (n == null || n <= 0) return 'Enter valid number of beds';
-    final occupied = _editing?.occupiedBeds ?? 0;
-    if (n < occupied) return '$occupied beds are already occupied';
+
+    final labels = _editing?.occupiedBedLabels ?? const <String>[];
+    final highest = labels
+        .map((l) => int.tryParse(l.substring(1)) ?? 0)
+        .fold<int>(0, math.max);
+    if (n < highest) {
+      return 'Bed A$highest is occupied, total beds cannot be less than $highest';
+    }
     return null;
   }
 
   Future<void> save() async {
     if (!formKey.currentState!.validate()) return;
+
+    // Reserved = khali room roka hua. Jis me students hain wo reserve nahi.
+    if (isReserved.value && (_editing?.occupiedBeds ?? 0) > 0) {
+      AppSnackbar.warning('A room with students cannot be marked as reserved.');
+      return;
+    }
 
     try {
       isSaving.value = true;
@@ -67,6 +95,7 @@ class RoomFormController extends GetxController {
         seater: seater.value,
         totalBeds: int.parse(bedsCtrl.text.trim()),
         occupiedBeds: _editing?.occupiedBeds ?? 0,
+        occupiedBedLabels: _editing?.occupiedBedLabels ?? const [],
         monthlyPrice: double.parse(priceCtrl.text.trim()),
         status: isReserved.value ? RoomStatus.reserved : RoomStatus.available,
       );

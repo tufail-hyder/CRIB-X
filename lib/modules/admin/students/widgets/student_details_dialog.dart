@@ -1,10 +1,10 @@
 import 'package:crib_x/modules/admin/students/widgets/payment_bridge.dart';
 import 'package:flutter/material.dart';
-
 import '../../../../core/constant/app_colors.dart';
 import '../../../../core/constant/app_sizes.dart';
 import '../../../../core/constant/date_text.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../../core/utils/formatters.dart';
 import '../../../../data/models/student_model.dart';
 import '../../../../shared/widgets/network_image.dart';
 
@@ -14,6 +14,8 @@ class StudentDetailsDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final key = StudentModel.monthKey(DateTime.now());
+
     return Dialog(
       backgroundColor: AppColors.white,
       insetPadding: const EdgeInsets.all(AppSizes.xl),
@@ -47,6 +49,12 @@ class StudentDetailsDialog extends StatelessWidget {
             _row('Check in Date', dateText(student.checkInDate)),
             if (!student.isActive && student.checkOutDate != null)
               _row('Check out Date', dateText(student.checkOutDate!)),
+            if (student.monthlyFee > 0) ...[
+              _row('Monthly fee', Formatters.currency(student.monthlyFee)),
+              _row('Paid this month',
+                  Formatters.currency(student.paidFor(key))),
+              _row('Remaining', Formatters.currency(student.remainingFor(key))),
+            ],
             Padding(
               padding: const EdgeInsets.only(top: AppSizes.sm),
               child: Row(

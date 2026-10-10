@@ -13,8 +13,8 @@ import '../../../../shared/widgets/network_image.dart';
 import '../../../../shared/widgets/shimmer_loader.dart';
 import '../../students/widgets/payment_bridge.dart';
 import '../../widgets/admin_scaffold.dart';
-import '../../widgets/monthly_income_chart.dart';
 import '../controllers/payment_controller.dart';
+import '../widgets/monthly_income_chart.dart';
 
 class PaymentsView extends GetView<PaymentsController> {
   const PaymentsView({super.key});
@@ -189,6 +189,15 @@ class _PaymentRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final key = StudentModel.monthKey(DateTime.now());
+    final paid = student.paidFor(key);
+    final status = student.paymentStatus;
+
+    // Partial payment ho to dikhao: "Paid 5,000 of 15,000"
+    final subtitle = (status != PaymentStatus.paid && paid > 0)
+        ? 'Paid ${Formatters.currency(paid)} of ${Formatters.currency(student.monthlyFee)}'
+        : 'Room ${student.roomNumber} · ${student.bed}';
+
     return InkWell(
       onTap: onTap,
       child: Padding(
@@ -205,13 +214,14 @@ class _PaymentRow extends StatelessWidget {
                   Text(student.name,
                       style: AppTextStyles.smallRegular,
                       overflow: TextOverflow.ellipsis),
-                  Text('Room ${student.roomNumber} · ${student.bed}',
+                  Text(subtitle,
                       style: AppTextStyles.smallRegular
-                          .copyWith(color: AppColors.gray600, fontSize: 11)),
+                          .copyWith(color: AppColors.gray600, fontSize: 11),
+                      overflow: TextOverflow.ellipsis),
                 ],
               ),
             ),
-            PaymentBadge(status: student.paymentStatus),
+            PaymentBadge(status: status),
           ],
         ),
       ),

@@ -5,7 +5,7 @@ import '../controllers/rooms_controller.dart';
 class RoomsBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut(() => RoomsController(Get.find(), Get.find()));
+    Get.lazyPut(() => RoomsController(Get.find(), Get.find(), Get.find()));
   }
 }
 

@@ -26,8 +26,8 @@ class BookingRepository {
   Future<void> createBooking(BookingModel b) =>
       _col(b.hostelId).add({...b.toJson(), 'createdAt': Timestamp.now()});
 
-  /// Approve = bed bharo + student record banao + booking approved.
-  /// Sab ek transaction me, taake bed double-book na ho.
+  /// Approve = bed bharo + student record banao (fee = room ki price) +
+  /// booking approved. Sab ek transaction me.
   Future<void> approve(BookingModel b) {
     final bookingRef = _col(b.hostelId).doc(b.id);
     final roomRef = _fs.doc('${_base(b.hostelId)}/rooms/${b.roomId}');
@@ -46,6 +46,7 @@ class BookingRepository {
       final data = roomSnap.data()!;
       final total = (data['totalBeds'] as num?)?.toInt() ?? 0;
       final labels = List<String>.from(data['occupiedBedLabels'] ?? []);
+      final fee = (data['monthlyPrice'] as num?)?.toDouble() ?? 0;
 
       if (labels.contains(b.bed)) {
         throw AppException(
@@ -71,6 +72,7 @@ class BookingRepository {
         roomNumber: b.roomNumber,
         bed: b.bed,
         checkInDate: b.checkInDate,
+        monthlyFee: fee,
       );
       tx.set(studentRef, {...student.toJson(), 'createdAt': Timestamp.now()});
 
