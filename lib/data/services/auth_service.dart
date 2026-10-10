@@ -18,4 +18,18 @@ class AuthService {
   Future<void> signOut() => _auth.signOut();
 
   Future<void> deleteCurrentUser() async => _auth.currentUser?.delete();
+
+  Future<void> changePassword(String current, String next) async {
+    final user = _auth.currentUser;
+    final email = user?.email;
+    if (user == null || email == null) {
+      throw FirebaseAuthException(
+        code: 'no-current-user',
+        message: 'Please log in again.',
+      );
+    }
+    final cred = EmailAuthProvider.credential(email: email, password: current);
+    await user.reauthenticateWithCredential(cred);
+    await user.updatePassword(next);
+  }
 }

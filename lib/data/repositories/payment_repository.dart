@@ -15,7 +15,6 @@ class PaymentRepository {
   CollectionReference<Map<String, dynamic>> _col(String hostelId) =>
       _fs.collection('${_base(hostelId)}/payments');
 
-  /// [since] ke baad ki payments (chart ke liye aakhri 6 mahine kaafi hain)
   Stream<List<PaymentModel>> watchPayments(String hostelId,
       {required DateTime since}) {
     return _col(hostelId)
@@ -25,12 +24,6 @@ class PaymentRepository {
         .map((snap) => snap.docs.map(PaymentModel.fromSnapshot).toList());
   }
 
-  /// Partial payment support: student ke us mahine ke total me jama hota hai,
-  /// aur fees se zyada nahi ja sakta. Transaction me, isliye double-tap ya
-  /// do admins ek saath bhi count galat nahi karte.
-  ///
-  /// [fallbackFee]: purane students jinki monthlyFee save nahi thi, unke liye
-  /// room ki price; payment ke saath student me bhi save ho jati hai.
   Future<void> recordPayment(PaymentModel p, {double fallbackFee = 0}) {
     final studentRef = _fs.doc('${_base(p.hostelId)}/students/${p.studentId}');
     final paymentRef = _col(p.hostelId).doc();
@@ -68,5 +61,17 @@ class PaymentRepository {
       });
       tx.set(paymentRef, {...p.toJson(), 'createdAt': Timestamp.now()});
     });
+  }
+
+  Future<List<PaymentModel>> fetchPayments(
+      String hostelId, {
+        required DateTime from,
+        required DateTime to,
+      }) async {
+    final snap = await _col(hostelId)
+        .where('paidAt', isGreaterThanOrEqualTo: Timestamp.fromDate(from))
+        .where('paidAt', isLessThan: Timestamp.fromDate(to))
+        .get();
+    return snap.docs.map(PaymentModel.fromSnapshot).toList();
   }
 }

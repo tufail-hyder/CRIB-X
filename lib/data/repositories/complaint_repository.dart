@@ -50,4 +50,16 @@ class ComplaintRepository {
           : null,
     });
   }
+
+  Future<List<ComplaintModel>> fetchComplaints(
+      String hostelId, {
+        required DateTime from,
+        required DateTime to,
+      }) async {
+    final snap = await _col(hostelId)
+        .where('createdAt', isGreaterThanOrEqualTo: Timestamp.fromDate(from))
+        .where('createdAt', isLessThan: Timestamp.fromDate(to))
+        .get();
+    return snap.docs.map(ComplaintModel.fromSnapshot).toList();
+  }
 }

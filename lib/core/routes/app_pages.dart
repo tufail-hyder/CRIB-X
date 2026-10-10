@@ -11,9 +11,13 @@ import '../../modules/admin/hostel_profile/views/hostel_profile_view.dart';
 import '../../modules/admin/payments/bindings/payment_binding.dart';
 import '../../modules/admin/payments/views/payment_form_view.dart';
 import '../../modules/admin/payments/views/payments_view.dart';
+import '../../modules/admin/reports/bindings/report_binding.dart';
+import '../../modules/admin/reports/views/report_view.dart';
 import '../../modules/admin/rooms/bindings/rooms_binding.dart';
 import '../../modules/admin/rooms/views/add_room_view.dart';
 import '../../modules/admin/rooms/views/rooms_view.dart';
+import '../../modules/admin/settings/bindings/setting_binding.dart';
+import '../../modules/admin/settings/views/setting_view.dart';
 import '../../modules/admin/students/bindings/student_binding.dart';
 import '../../modules/admin/students/views/student_form_view.dart';
 import '../../modules/admin/students/views/student_view.dart';
@@ -107,6 +111,17 @@ GetPage(
   page: () => const ComplaintFormView(),
   binding: ComplaintFormBinding(),
 ),
+  GetPage(
+  name: AppRoutes.adminReports,
+  page: () => const ReportsView(),
+  binding: ReportsBinding(),
+),
+  GetPage(
+  name: AppRoutes.adminSettings,
+  page: () => const SettingsView(),
+  binding: SettingsBinding(),
+),
+
 
     ...adminMenu
         .where((m) => !_implemented.contains(m.route))

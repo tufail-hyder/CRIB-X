@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../core/constant/firebase_constants.dart';
 import '../../core/exceptions/app_exception.dart';
 import '../models/user_model.dart';
@@ -92,6 +93,25 @@ class AuthRepository {
   Future<void> sendPasswordReset(String email) =>
       _auth.sendPasswordReset(email);
 
-  Future<void> logout() => _auth.signOut();
+  /// Settings page: purana password check karke naya set karo
+  Future<void> changePassword(String current, String next) async {
+    try {
+      await _auth.changePassword(current, next);
+    } on FirebaseAuthException catch (e) {
+      switch (e.code) {
+        case 'wrong-password':
+        case 'invalid-credential':
+        case 'invalid-login-credentials':
+          throw const AppException('Current password is incorrect.');
+        case 'weak-password':
+          throw const AppException('New password is too weak.');
+        case 'too-many-requests':
+          throw const AppException('Too many attempts. Try again later.');
+        default:
+          rethrow;
+      }
+    }
+  }
 
+  Future<void> logout() => _auth.signOut();
 }
