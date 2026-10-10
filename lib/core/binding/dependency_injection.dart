@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import '../../data/repositories/auth_repository.dart';
 import '../../data/repositories/booking_repository.dart';
+import '../../data/repositories/complaint_repository.dart';
 import '../../data/repositories/hostel_repository.dart';
 import '../../data/repositories/payment_repository.dart';
 import '../../data/repositories/room_repository.dart'; // <- add
@@ -24,5 +25,6 @@ class DependencyInjection {
     Get.put(StudentRepository(Get.find<FirestoreService>()), permanent: true);
     Get.put(BookingRepository(Get.find<FirestoreService>()), permanent: true);
     Get.put(PaymentRepository(Get.find<FirestoreService>()), permanent: true);
+    Get.put(ComplaintRepository(Get.find<FirestoreService>()), permanent: true);
   }
 }

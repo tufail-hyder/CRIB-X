@@ -26,19 +26,44 @@ enum ComplaintStatus {
 
 enum ComplaintCategory {
   maintenance,
+  wifi,
   food,
-  cleanliness,
-  electricity,
   water,
+  electricity,
+  cleanliness,
   security,
   other;
 
-  String get label => name[0].toUpperCase() + name.substring(1);
+  String get label {
+    switch (this) {
+      case ComplaintCategory.wifi:
+        return 'WiFi';
+      case ComplaintCategory.cleanliness:
+        return 'Cleaning';
+      default:
+        return name[0].toUpperCase() + name.substring(1);
+    }
+  }
 
   static ComplaintCategory fromString(String? value) {
     return ComplaintCategory.values.firstWhere(
           (e) => e.name == value,
       orElse: () => ComplaintCategory.other,
+    );
+  }
+}
+
+enum ComplaintPriority {
+  low,
+  medium,
+  high;
+
+  String get label => name[0].toUpperCase() + name.substring(1);
+
+  static ComplaintPriority fromString(String? value) {
+    return ComplaintPriority.values.firstWhere(
+          (e) => e.name == value,
+      orElse: () => ComplaintPriority.medium,
     );
   }
 }
@@ -52,6 +77,7 @@ class ComplaintModel {
   final String title;
   final String description;
   final ComplaintCategory category;
+  final ComplaintPriority priority;
   final ComplaintStatus status;
   final List<String> images;
   final String? adminResponse;
@@ -68,6 +94,7 @@ class ComplaintModel {
     required this.title,
     required this.description,
     this.category = ComplaintCategory.other,
+    this.priority = ComplaintPriority.medium,
     this.status = ComplaintStatus.open,
     this.images = const [],
     this.adminResponse,
@@ -105,6 +132,7 @@ class ComplaintModel {
       title: json['title'] ?? '',
       description: json['description'] ?? '',
       category: ComplaintCategory.fromString(json['category']),
+      priority: ComplaintPriority.fromString(json['priority']),
       status: ComplaintStatus.fromString(json['status']),
       images: List<String>.from(json['images'] ?? []),
       adminResponse: json['adminResponse'],
@@ -124,6 +152,7 @@ class ComplaintModel {
       'title': title,
       'description': description,
       'category': category.name,
+      'priority': priority.name,
       'status': status.name,
       'images': images,
       'adminResponse': adminResponse,
@@ -142,6 +171,7 @@ class ComplaintModel {
     String? title,
     String? description,
     ComplaintCategory? category,
+    ComplaintPriority? priority,
     ComplaintStatus? status,
     List<String>? images,
     String? adminResponse,
@@ -158,6 +188,7 @@ class ComplaintModel {
       title: title ?? this.title,
       description: description ?? this.description,
       category: category ?? this.category,
+      priority: priority ?? this.priority,
       status: status ?? this.status,
       images: images ?? this.images,
       adminResponse: adminResponse ?? this.adminResponse,
@@ -168,7 +199,11 @@ class ComplaintModel {
   }
 
   bool get isOpen => status == ComplaintStatus.open;
+  bool get isInProgress => status == ComplaintStatus.inProgress;
   bool get isResolved => status == ComplaintStatus.resolved;
+
+  String get shortId =>
+      '#${(id.length >= 6 ? id.substring(0, 6) : id).toUpperCase()}';
 
   static DateTime? _toDate(dynamic value) {
     if (value is Timestamp) return value.toDate();

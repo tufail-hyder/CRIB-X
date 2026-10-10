@@ -9,10 +9,13 @@ import '../../../../data/models/dashboard_stats_model.dart';
 class MonthlyIncomeChart extends StatefulWidget {
   final List<IncomePoint> points;
   final String title;
+
+  final String tooltipLabel;
   const MonthlyIncomeChart({
     super.key,
     required this.points,
     this.title = 'Monthly Revenue',
+    this.tooltipLabel = 'Revenue',
   });
 
   @override
@@ -71,6 +74,7 @@ class _MonthlyIncomeChartState extends State<MonthlyIncomeChart> {
                       points: widget.points,
                       scale: scale,
                       selected: _selected,
+                      tooltipLabel: widget.tooltipLabel,
                     ),
                   ),
                 );
@@ -105,11 +109,13 @@ class _ChartPainter extends CustomPainter {
   final List<IncomePoint> points;
   final _Scale scale;
   final int? selected;
+  final String tooltipLabel;
 
   _ChartPainter({
     required this.points,
     required this.scale,
     required this.selected,
+    required this.tooltipLabel,
   });
 
   static const double left = 44, right = 16, top = 44, bottom = 28;
@@ -141,10 +147,13 @@ class _ChartPainter extends CustomPainter {
       .toString()
       .replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (_) => ',');
 
-  TextPainter _text(String s, TextStyle style) => TextPainter(
-    text: TextSpan(text: s, style: style),
-    textDirection: TextDirection.ltr,
-  )..layout();
+  TextPainter _text(String s, TextStyle style, {double? maxWidth}) =>
+      TextPainter(
+        text: TextSpan(text: s, style: style),
+        textDirection: TextDirection.ltr,
+        maxLines: 1,
+        ellipsis: '…',
+      )..layout(maxWidth: maxWidth ?? double.infinity);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -163,10 +172,16 @@ class _ChartPainter extends CustomPainter {
     }
 
     // x labels
+    // Lambe naam (Maintenance, Electricity) ek doosre par na charhen: slot
+    // ki chaurai tak, baqi '…'
+    final slot = (size.width - left - right) /
+        math.max(1, points.length - 1);
     for (var i = 0; i < points.length; i++) {
-      final tp = _text(points[i].label, axisStyle);
+      final tp = _text(points[i].label, axisStyle,
+          maxWidth: math.max(28.0, slot));
       final x = xAt(i, points.length, size.width);
-      tp.paint(canvas, Offset(x - tp.width / 2, size.height - bottom + 8));
+      final dx = (x - tp.width / 2).clamp(0.0, size.width - tp.width).toDouble();
+      tp.paint(canvas, Offset(dx, size.height - bottom + 8));
     }
 
     final pos = [for (var i = 0; i < points.length; i++) _pos(i, size)];
@@ -205,7 +220,7 @@ class _ChartPainter extends CustomPainter {
 
     // Dots
     for (var i = 0; i < pos.length; i++) {
-      canvas.drawCircle(pos[i], 5, Paint()..color = Colors.white);
+      canvas.drawCircle(pos[i], 5, Paint()..color = AppColors.white);
       canvas.drawCircle(
         pos[i],
         5,
@@ -219,7 +234,7 @@ class _ChartPainter extends CustomPainter {
     // Tooltip
     if (selected != null && selected! < pos.length) {
       final p = pos[selected!];
-      final title = _text('Revenue',
+      final title = _text(tooltipLabel,
           const TextStyle(fontSize: 10, color: Color(0xCCFFFFFF)));
       final value = _text(
         _money(points[selected!].value),
