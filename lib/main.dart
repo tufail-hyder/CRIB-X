@@ -8,7 +8,7 @@ import 'core/routes/initial_route_resolver.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
-  final binding = WidgetsFlutterBinding.ensureInitialized();//
+  final binding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: binding);
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
