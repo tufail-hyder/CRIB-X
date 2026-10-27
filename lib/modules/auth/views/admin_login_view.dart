@@ -47,8 +47,7 @@ class AdminLoginView extends GetView<LoginController> {
                         controller: controller.passwordCtrl,
                         isPassword: true,
                         textInputAction: TextInputAction.done,
-                        validator: (v) =>
-                            Validators.required(v, 'Password'),
+                        validator: (v) => Validators.required(v, 'Password'),
                       ),
                       AppSizes.hSm,
                       Align(
@@ -64,10 +63,6 @@ class AdminLoginView extends GetView<LoginController> {
                 ),
               ),
             ),
-            TextButton(
-            onPressed: () => Get.offAllNamed(AppRoutes.studentLogin),
-            child: const Text('Student? Login here'),
-          ),
             Padding(
               padding: const EdgeInsets.fromLTRB(
                   AppSizes.xl, 0, AppSizes.xl, AppSizes.xl),
@@ -82,14 +77,22 @@ class AdminLoginView extends GetView<LoginController> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text("Don't have account. ",
-                          style: AppTextStyles.body),
+                      Text("Don't have account. ", style: AppTextStyles.body),
                       GestureDetector(
                         onTap: () => Get.toNamed(AppRoutes.adminSignup),
                         child: Text('Sign up',
                             style: AppTextStyles.oneLinerSemiBold),
                       ),
                     ],
+                  ),
+                  AppSizes.hMd,
+                  GestureDetector(
+                    onTap: () => Get.offAllNamed(AppRoutes.studentLogin),
+                    child: Text(
+                      'Student? Login here',
+                      style: AppTextStyles.smallRegular
+                          .copyWith(color: AppColors.gray600),
+                    ),
                   ),
                 ],
               ),
