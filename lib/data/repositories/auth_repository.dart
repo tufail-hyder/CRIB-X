@@ -72,7 +72,63 @@ class AuthRepository {
     final user = UserModel.fromSnapshot(snap);
     if (!user.isAdmin) {
       await _auth.signOut();
-      throw const AppException('This is not a hostel admin account.');
+      throw const AppException(
+          'This is a student account. Please use Student login.');
+    }
+    return user;
+  }
+
+  /// Student account: users/{uid} + private CNIC (sirf student khud dekh sakta hai)
+  Future<UserModel> registerStudent({
+    required String name,
+    required String email,
+    required String password,
+    required String phone,
+    required String cnic,
+  }) async {
+    final cred = await _auth.signUp(email, password);
+    final uid = cred.user!.uid;
+
+    final user = UserModel(
+      uid: uid,
+      role: UserRole.student,
+      name: name,
+      email: email,
+      phone: phone,
+      createdAt: DateTime.now(),
+    );
+
+    try {
+      final batch = _fs.batch();
+      batch.set(_fs.doc('${FirebaseConstants.users}/$uid'), user.toJson());
+      batch.set(
+        _fs.doc(
+            '${FirebaseConstants.users}/$uid/${FirebaseConstants.privateSubcollection}/${FirebaseConstants.kycDoc}'),
+        {'cnic': cnic},
+      );
+      await batch.commit();
+      return user;
+    } catch (_) {
+      await _auth.deleteCurrentUser();
+      rethrow;
+    }
+  }
+
+  Future<UserModel> loginStudent(String email, String password) async {
+    final cred = await _auth.signIn(email, password);
+    final snap =
+    await _fs.getDoc('${FirebaseConstants.users}/${cred.user!.uid}');
+
+    if (!snap.exists) {
+      await _auth.signOut();
+      throw const AppException('Account not found. Please sign up.');
+    }
+
+    final user = UserModel.fromSnapshot(snap);
+    if (user.isAdmin) {
+      await _auth.signOut();
+      throw const AppException(
+          'This is a hostel owner account. Please use Hostel Owner login.');
     }
     return user;
   }

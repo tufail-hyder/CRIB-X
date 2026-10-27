@@ -18,4 +18,7 @@ class AppRoutes {
   static const bookingForm = '/booking-form';
   static const paymentForm = '/payment-form';
   static const complaintForm = '/complaint-form';
+  static const studentLogin = '/student/login';
+  static const studentSignup = '/student/signup';
+  static const studentHome = '/student/home';
 }

@@ -64,6 +64,10 @@ class AdminLoginView extends GetView<LoginController> {
                 ),
               ),
             ),
+            TextButton(
+            onPressed: () => Get.offAllNamed(AppRoutes.studentLogin),
+            child: const Text('Student? Login here'),
+          ),
             Padding(
               padding: const EdgeInsets.fromLTRB(
                   AppSizes.xl, 0, AppSizes.xl, AppSizes.xl),

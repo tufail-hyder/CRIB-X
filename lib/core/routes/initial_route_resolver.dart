@@ -1,27 +1,26 @@
 import 'package:get/get.dart';
 import '../../data/repositories/auth_repository.dart';
-import '../utils/logger.dart';
 import 'app_routes.dart';
 
 class InitialRouteResolver {
   InitialRouteResolver._();
 
   static Future<String> resolve() async {
-    final repo = Get.find<AuthRepository>();
-    if (!repo.isLoggedIn) return AppRoutes.adminLogin;
+    final auth = Get.find<AuthRepository>();
+
+    if (!auth.isLoggedIn) return AppRoutes.adminLogin;
 
     try {
-      final user =
-      await repo.getCurrentUser().timeout(const Duration(seconds: 8));
+      final user = await auth.getCurrentUser();
 
       if (user == null) {
-        await repo.logout();
+        await auth.logout();
         return AppRoutes.adminLogin;
       }
-      if (user.isAdmin) return AppRoutes.adminDashboard;
-    } catch (e, s) {
-      AppLogger.e('Initial route check failed', e, s);
+
+      return user.isAdmin ? AppRoutes.adminDashboard : AppRoutes.studentHome;
+    } catch (_) {
+      return AppRoutes.adminLogin;
     }
-    return AppRoutes.adminLogin;
   }
 }
