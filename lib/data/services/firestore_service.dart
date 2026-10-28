@@ -8,6 +8,9 @@ class FirestoreService {
   CollectionReference<Map<String, dynamic>> collection(String path) =>
       _db.collection(path);
 
+  Query<Map<String, dynamic>> collectionGroup(String id) =>
+      _db.collectionGroup(id);
+
   WriteBatch batch() => _db.batch();
 
   Future<DocumentSnapshot<Map<String, dynamic>>> getDoc(String path) =>

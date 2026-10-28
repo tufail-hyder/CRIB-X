@@ -28,7 +28,8 @@ import '../../modules/auth/bindings/student_auth_binding.dart';
 import '../../modules/auth/views/admin_login_view.dart';
 import '../../modules/auth/views/student_login_view.dart';
 import '../../modules/auth/views/student_signup_view.dart';
-import '../../modules/student/home/views/student_home_view.dart';
+import '../../modules/student/home/bindings/student_dashboard_binding.dart';
+import '../../modules/student/home/views/student_dashboard_view.dart';
 import '../binding/dashboard_binding.dart';
 import '../binding/hostel_profile_binding.dart';
 import 'app_routes.dart';
@@ -137,7 +138,8 @@ GetPage(
 ),
 GetPage(
   name: AppRoutes.studentHome,
-  page: () => const StudentHomeView(),
+  page: () => const StudentDashboardView(),
+  binding: StudentDashboardBinding(),
 ),
 
 
