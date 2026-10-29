@@ -28,6 +28,8 @@ import '../../modules/auth/bindings/student_auth_binding.dart';
 import '../../modules/auth/views/admin_login_view.dart';
 import '../../modules/auth/views/student_login_view.dart';
 import '../../modules/auth/views/student_signup_view.dart';
+import '../../modules/student/favorites/bindings/favorite_binding.dart';
+import '../../modules/student/favorites/views/favorite_view.dart';
 import '../../modules/student/home/bindings/student_dashboard_binding.dart';
 import '../../modules/student/home/views/student_dashboard_view.dart';
 import '../../modules/student/hostel_detail/views/hostel_details_views.dart';
@@ -145,6 +147,11 @@ GetPage(
 GetPage(
   name: AppRoutes.hostelDetails,
   page: () => const HostelDetailsView(),
+),
+    GetPage(
+  name: AppRoutes.studentFavorites,
+  page: () => const FavoritesView(),
+  binding: FavoritesBinding(),
 ),
 
     ...adminMenu

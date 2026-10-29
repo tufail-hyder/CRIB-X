@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../core/constant/firebase_constants.dart';
+import '../../modules/student/widegts/hostel_listing.dart';
 import '../models/hostel_model.dart';
 import '../models/room_model.dart';
 import '../models/student_model.dart';
@@ -13,12 +14,10 @@ class RoomSummary {
   const RoomSummary(this.availableBeds, this.seaters, this.minPrice);
 }
 
-/// Student portal ka data: hostels, rooms, favorites, apna stay
 class StudentHomeRepository {
   final FirestoreService _fs;
   StudentHomeRepository(this._fs);
 
-  /// Sab active hostels jinka naam bhara ho (adhure profile nahi)
   Future<List<HostelModel>> fetchHostels() async {
     final snap = await _fs
         .collection(FirebaseConstants.hostels)
@@ -64,7 +63,21 @@ class StudentHomeRepository {
     }
   }
 
-  /// Ek hostel ke saare rooms (Details + booking ke liye)
+  Future<List<HostelListing>> fetchListings() async {
+    final hostels = await fetchHostels();
+    final summaries = await fetchRoomSummaries();
+
+    return hostels.map((h) {
+      final s = summaries?[h.id];
+      return HostelListing(
+        h,
+        availableBeds: summaries == null ? null : (s?.availableBeds ?? 0),
+        seaters: s?.seaters ?? const <int>{},
+        minRoomPrice: s?.minPrice,
+      );
+    }).toList();
+  }
+
   Future<List<RoomModel>> fetchRooms(String hostelId) async {
     final snap = await _fs
         .collection('${FirebaseConstants.hostels}/$hostelId/rooms')
@@ -73,8 +86,6 @@ class StudentHomeRepository {
     return snap.docs.map(RoomModel.fromSnapshot).toList();
   }
 
-  /// Student ka apna abhi ka stay record (admin ne jo student record banaya
-  /// aur userId se jora). Nahi mila ya ijazat nahi = null.
   Future<StudentModel?> fetchMyStay(String uid) async {
     try {
       final snap = await _fs
@@ -93,11 +104,32 @@ class StudentHomeRepository {
     }
   }
 
-  // ---------------- Favorites: users/{uid}.favoriteHostelIds ----------------
+  // ---------------- Favorites ----------------
+  // users/{uid}.favoriteHostelIds       : [hostelId, ...]
+  // users/{uid}.favoriteAdded.{hostelId}: kab save kiya (Timestamp)
+
   Stream<Set<String>> watchFavorites(String uid) {
     return _fs.doc('${FirebaseConstants.users}/$uid').snapshots().map((snap) {
       final raw = snap.data()?['favoriteHostelIds'];
       return raw is List ? raw.map((e) => e.toString()).toSet() : <String>{};
+    });
+  }
+
+  Stream<Map<String, DateTime?>> watchFavoriteEntries(String uid) {
+    return _fs.doc('${FirebaseConstants.users}/$uid').snapshots().map((snap) {
+      final data = snap.data() ?? {};
+      final ids = data['favoriteHostelIds'];
+      final added = data['favoriteAdded'];
+
+      final result = <String, DateTime?>{};
+      if (ids is List) {
+        for (final raw in ids) {
+          final id = raw.toString();
+          final t = added is Map ? added[id] : null;
+          result[id] = t is Timestamp ? t.toDate() : null;
+        }
+      }
+      return result;
     });
   }
 
@@ -106,6 +138,8 @@ class StudentHomeRepository {
       'favoriteHostelIds': add
           ? FieldValue.arrayUnion([hostelId])
           : FieldValue.arrayRemove([hostelId]),
+      'favoriteAdded.$hostelId':
+      add ? Timestamp.now() : FieldValue.delete(),
     });
   }
 }

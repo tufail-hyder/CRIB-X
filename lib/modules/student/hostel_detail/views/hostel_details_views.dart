@@ -32,7 +32,6 @@ class HostelDetailsView extends StatelessWidget {
     return _Body(args: args);
   }
 }
-
 class _Body extends StatefulWidget {
   final HostelDetailsArgs args;
   const _Body({required this.args});
@@ -238,9 +237,9 @@ class _Gallery extends StatelessWidget {
     final images = c.hostel.images;
 
     return Obx(() {
-      final index = images.isEmpty
-          ? 0
-          : c.selectedImage.value.clamp(0, images.length - 1).toInt();
+      final selected = c.selectedImage.value;
+      final index =
+      images.isEmpty ? 0 : selected.clamp(0, images.length - 1).toInt();
 
       return Column(
         children: [

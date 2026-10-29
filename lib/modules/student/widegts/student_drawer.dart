@@ -32,6 +32,7 @@ class StudentDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final onDashboard = currentRoute == AppRoutes.studentHome;
+    final onFavorites = currentRoute == AppRoutes.studentFavorites;
 
     return Drawer(
       backgroundColor: AppColors.white,
@@ -67,9 +68,10 @@ class StudentDrawer extends StatelessWidget {
           _Item(
             icon: Icons.favorite_rounded,
             label: 'Favorites',
+            selected: onFavorites,
             onTap: () {
               Get.back();
-              AppSnackbar.info('Favorites screen is coming next.');
+              if (!onFavorites) Get.offAllNamed(AppRoutes.studentFavorites);
             },
           ),
           _Item(

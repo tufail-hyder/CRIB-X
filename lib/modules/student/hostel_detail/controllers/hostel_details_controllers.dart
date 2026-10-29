@@ -63,9 +63,10 @@ class HostelDetailsController extends GetxController {
   bool hasRoomType(int seater) => rooms.any((r) => r.seater == seater);
 
   double? get displayPrice {
-    if (hostel.monthlyPrice > 0) return hostel.monthlyPrice;
     final prices =
     freeRooms.map((r) => r.monthlyPrice).where((p) => p > 0).toList()..sort();
+
+    if (hostel.monthlyPrice > 0) return hostel.monthlyPrice;
     return prices.isEmpty ? listing.minRoomPrice : prices.first;
   }
 
@@ -101,6 +102,8 @@ class HostelDetailsController extends GetxController {
 
   void openNotifications() => AppSnackbar.info('No new notifications.');
 
+  // ------------------------------------------------------------------
+  // Book Now
   Future<void> startBooking() async {
     if (isLoadingRooms.value) return;
     if (freeRooms.isEmpty) {
