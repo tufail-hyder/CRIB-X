@@ -22,6 +22,16 @@ class BookingRepository {
         .map((snap) => snap.docs.map(BookingModel.fromSnapshot).toList());
   }
 
+  /// Student ne is hostel me pehle se Pending request to nahi bhej rakhi
+  Future<bool> hasPendingRequest(String hostelId, String userId) async {
+    final snap = await _col(hostelId)
+        .where('userId', isEqualTo: userId)
+        .where('status', isEqualTo: BookingStatus.pending.name)
+        .limit(1)
+        .get();
+    return snap.docs.isNotEmpty;
+  }
+
   /// Nayi booking hamesha Pending banti hai. Bed tab bharta hai jab approve ho.
   Future<void> createBooking(BookingModel b) =>
       _col(b.hostelId).add({...b.toJson(), 'createdAt': Timestamp.now()});

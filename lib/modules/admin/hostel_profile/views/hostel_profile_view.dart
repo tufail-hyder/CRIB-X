@@ -3,7 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import '../../../../core/constant/app_colors.dart';
 import '../../../../core/constant/app_sizes.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/validators.dart';
+import '../../../../data/models/hostel_model.dart';
 import '../../../../shared/widgets/buttons/primary_button.dart';
 import '../../../../shared/widgets/cards/section_card.dart';
 import '../../../../shared/widgets/empty_state.dart';
@@ -96,14 +98,31 @@ class HostelProfileView extends GetView<HostelProfileController> {
                       validator: (v) => Validators.required(v, 'City'),
                     ),
                     AppSizes.hMd,
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text('Hostel is for', style: AppTextStyles.label),
+                    ),
+                    AppSizes.hSm,
+                    Obx(() => DropdownButtonFormField<HostelGender>(
+                      value: c.gender.value,
+                      isExpanded: true,
+                      style: AppTextStyles.oneLinerRegular
+                          .copyWith(color: Colors.black),
+                      items: HostelGender.values
+                          .map((g) => DropdownMenuItem(
+                          value: g, child: Text(g.label)))
+                          .toList(),
+                      onChanged: (v) {
+                        if (v != null) c.gender.value = v;
+                      },
+                    )),
+                    AppSizes.hMd,
                     CustomTextField(
                       label: 'Monthly Price',
                       hint: 'e.g. 15000',
                       controller: c.priceCtrl,
                       keyboardType: TextInputType.number,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly
-                      ],
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       validator: (v) =>
                           Validators.positiveNumber(v, 'Monthly price'),
                     ),
@@ -140,8 +159,7 @@ class HostelProfileView extends GetView<HostelProfileController> {
                   maxLength: 500,
                   textInputAction: TextInputAction.newline,
                   keyboardType: TextInputType.multiline,
-                  validator: (v) =>
-                      Validators.minLength(v, 10, 'Description'),
+                  validator: (v) => Validators.minLength(v, 10, 'Description'),
                 ),
               ),
               AppSizes.hLg,

@@ -30,6 +30,7 @@ import '../../modules/auth/views/student_login_view.dart';
 import '../../modules/auth/views/student_signup_view.dart';
 import '../../modules/student/home/bindings/student_dashboard_binding.dart';
 import '../../modules/student/home/views/student_dashboard_view.dart';
+import '../../modules/student/hostel_detail/views/hostel_details_views.dart';
 import '../binding/dashboard_binding.dart';
 import '../binding/hostel_profile_binding.dart';
 import 'app_routes.dart';
@@ -141,7 +142,10 @@ GetPage(
   page: () => const StudentDashboardView(),
   binding: StudentDashboardBinding(),
 ),
-
+GetPage(
+  name: AppRoutes.hostelDetails,
+  page: () => const HostelDetailsView(),
+),
 
     ...adminMenu
         .where((m) => !_implemented.contains(m.route))

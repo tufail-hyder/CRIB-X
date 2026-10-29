@@ -21,4 +21,5 @@ class AppRoutes {
   static const studentLogin = '/student/login';
   static const studentSignup = '/student/signup';
   static const studentHome = '/student/home';
+  static const hostelDetails = '/student/hostel-details';
 }

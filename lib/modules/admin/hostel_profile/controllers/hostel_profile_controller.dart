@@ -30,6 +30,7 @@ class HostelProfileController extends GetxController {
 
   final images = <String>[].obs;
   final amenities = <String>[].obs;
+  final gender = HostelGender.coLiving.obs;
 
   final isLoaded = false.obs;
   final isLoading = true.obs;
@@ -57,6 +58,7 @@ class HostelProfileController extends GetxController {
     phoneCtrl.text = h.contactNumber;
     emailCtrl.text = h.email;
     descCtrl.text = h.description;
+    gender.value = h.gender;
     images.assignAll(h.images);
     amenities.assignAll(h.amenities);
     isLoaded.value = true;
@@ -142,6 +144,7 @@ class HostelProfileController extends GetxController {
         contactNumber: phoneCtrl.text.trim(),
         email: emailCtrl.text.trim(),
         description: descCtrl.text.trim(),
+        gender: gender.value,
         images: List<String>.of(images),
         amenities: List<String>.of(amenities),
       );
@@ -166,6 +169,7 @@ class HostelProfileController extends GetxController {
         phoneCtrl.text.trim() != o.contactNumber ||
         emailCtrl.text.trim() != o.email ||
         descCtrl.text.trim() != o.description ||
+        gender.value != o.gender ||
         !listEquals(images, o.images) ||
         !listEquals(amenities, o.amenities);
   }

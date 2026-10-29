@@ -26,6 +26,12 @@ class StudentDashboardView extends GetView<StudentDashboardController> {
         StudentHeaderIcon(icon: Icons.search_rounded, onTap: c.toggleSearch),
         StudentHeaderIcon(
             icon: Icons.notifications_none_rounded, onTap: c.openNotifications),
+        // Filter laga ho to icon purple ho jata hai
+        Obx(() => StudentHeaderIcon(
+          icon: Icons.tune_rounded,
+          active: c.filter.value.isActive,
+          onTap: c.openFilters,
+        )),
       ],
       body: Obx(() {
         if (c.listings.isEmpty) {
@@ -42,6 +48,7 @@ class StudentDashboardView extends GetView<StudentDashboardController> {
         }
 
         final list = c.visible;
+        final filtering = c.filter.value.isActive;
 
         return RefreshIndicator(
           onRefresh: c.load,
@@ -108,12 +115,16 @@ class StudentDashboardView extends GetView<StudentDashboardController> {
               ),
               AppSizes.hMd,
               if (list.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.only(top: AppSizes.xl),
+                Padding(
+                  padding: const EdgeInsets.only(top: AppSizes.xl),
                   child: EmptyState(
                     icon: Icons.apartment_rounded,
                     title: 'No hostels found',
-                    message: 'Try a different search or tab.',
+                    message: filtering
+                        ? 'No hostel matches your filters.'
+                        : 'Try a different search or tab.',
+                    actionText: filtering ? 'Reset filters' : null,
+                    onAction: filtering ? c.resetFilters : null,
                   ),
                 )
               else
@@ -123,7 +134,7 @@ class StudentDashboardView extends GetView<StudentDashboardController> {
                     listing: l,
                     isFavorite: c.favorites.contains(l.hostel.id),
                     onFavorite: () => c.toggleFavorite(l.hostel.id),
-                    onView: () => c.viewDetails(l.hostel),
+                    onView: () => c.viewDetails(l),
                   ),
                 )),
             ],

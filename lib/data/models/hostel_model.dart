@@ -1,5 +1,26 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+/// Hostel kin ke liye hai (admin Hostel Profile me chunta hai)
+enum HostelGender {
+  male,
+  female,
+  coLiving;
+
+  String get label {
+    switch (this) {
+      case HostelGender.male:
+        return 'Male';
+      case HostelGender.female:
+        return 'Female';
+      case HostelGender.coLiving:
+        return 'Co-living';
+    }
+  }
+
+  static HostelGender fromString(String? v) => HostelGender.values
+      .firstWhere((e) => e.name == v, orElse: () => HostelGender.coLiving);
+}
+
 class HostelModel {
   final String id;
   final String adminId;
@@ -10,6 +31,7 @@ class HostelModel {
   final String contactNumber;
   final String email;
   final String description;
+  final HostelGender gender;
   final List<String> images;
   final List<String> amenities;
   final bool isActive;
@@ -26,6 +48,7 @@ class HostelModel {
     this.contactNumber = '',
     this.email = '',
     this.description = '',
+    this.gender = HostelGender.coLiving,
     this.images = const [],
     this.amenities = const [],
     this.isActive = true,
@@ -49,6 +72,7 @@ class HostelModel {
       contactNumber: json['contactNumber'] ?? '',
       email: json['email'] ?? '',
       description: json['description'] ?? '',
+      gender: HostelGender.fromString(json['gender']),
       images: List<String>.from(json['images'] ?? []),
       amenities: List<String>.from(json['amenities'] ?? []),
       isActive: json['isActive'] ?? true,
@@ -66,6 +90,7 @@ class HostelModel {
     'contactNumber': contactNumber,
     'email': email,
     'description': description,
+    'gender': gender.name,
     'images': images,
     'amenities': amenities,
     'updatedAt': Timestamp.now(),
@@ -79,6 +104,7 @@ class HostelModel {
     String? contactNumber,
     String? email,
     String? description,
+    HostelGender? gender,
     List<String>? images,
     List<String>? amenities,
   }) {
@@ -92,6 +118,7 @@ class HostelModel {
       contactNumber: contactNumber ?? this.contactNumber,
       email: email ?? this.email,
       description: description ?? this.description,
+      gender: gender ?? this.gender,
       images: images ?? this.images,
       amenities: amenities ?? this.amenities,
       isActive: isActive,

@@ -1,13 +1,18 @@
 import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../../core/constant/app_colors.dart';
 import '../../../../core/constant/date_text.dart';
 import '../../../../core/exceptions/exception_handler.dart';
 import '../../../../core/network/network_manager.dart';
+import '../../../../core/routes/app_routes.dart';
+import '../../../../data/models/hostel_filter.dart';
 import '../../../../data/models/hostel_model.dart';
 import '../../../../data/models/student_model.dart';
 import '../../../../data/repositories/auth_repository.dart';
 import '../../../../data/repositories/student_home_repository.dart';
 import '../../../../shared/popups/app_snackbar.dart';
+import '../../hostel_detail/widgets/hostel_filter_sheet.dart';
 import '../../widegts/hostel_listing.dart';
 
 enum HomeTab {
@@ -38,6 +43,7 @@ class StudentDashboardController extends GetxController {
 
   final tab = HomeTab.featured.obs;
   final query = ''.obs;
+  final filter = Rx<HostelFilter>(const HostelFilter());
   final showSearch = false.obs;
   final showBanner = true.obs;
 
@@ -64,12 +70,18 @@ class StudentDashboardController extends GetxController {
       await NetworkManager.instance.ensureConnected();
 
       final hostels = await _repo.fetchHostels();
-      final beds = await _repo.fetchAvailableBeds(); // null = pata nahi
+      final summaries = await _repo.fetchRoomSummaries();
       final stay = await _repo.fetchMyStay(_uid);
 
-      listings.assignAll(
-        hostels.map((h) => HostelListing(h, beds == null ? null : (beds[h.id] ?? 0))),
-      );
+      listings.assignAll(hostels.map((h) {
+        final s = summaries?[h.id];
+        return HostelListing(
+          h,
+          availableBeds: summaries == null ? null : (s?.availableBeds ?? 0),
+          seaters: s?.seaters ?? const <int>{},
+          minRoomPrice: s?.minPrice,
+        );
+      }));
       myStay.value = stay;
     } catch (e, s) {
       final msg = ExceptionHandler.message(e, s);
@@ -83,14 +95,57 @@ class StudentDashboardController extends GetxController {
     }
   }
 
+  List<String> get cities {
+    final map = <String, String>{};
+    for (final l in listings) {
+      final c = l.hostel.city.trim();
+      if (c.isNotEmpty) map.putIfAbsent(c.toLowerCase(), () => c);
+    }
+    return map.values.toList()..sort();
+  }
+
+  List<String> get amenityOptions {
+    final map = <String, String>{};
+    for (final l in listings) {
+      for (final a in l.hostel.amenities) {
+        final t = a.trim();
+        if (t.isNotEmpty) map.putIfAbsent(t.toLowerCase(), () => t);
+      }
+    }
+    return map.values.toList()..sort();
+  }
+
+  void openFilters() {
+    Get.bottomSheet(
+      HostelFilterSheet(
+        initial: filter.value,
+        cities: cities,
+        amenityOptions: amenityOptions,
+        onApply: (f) => filter.value = f,
+      ),
+      isScrollControlled: true,
+      backgroundColor: AppColors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+    );
+  }
+
+  void resetFilters() => filter.value = const HostelFilter();
+
   List<HostelListing> get visible {
     final q = query.value;
+    final f = filter.value;
+
     var list = listings.where((l) {
-      if (q.isEmpty) return true;
-      final h = l.hostel;
-      return h.name.toLowerCase().contains(q) ||
-          h.city.toLowerCase().contains(q) ||
-          h.address.toLowerCase().contains(q);
+      if (q.isNotEmpty) {
+        final h = l.hostel;
+        final hit = h.name.toLowerCase().contains(q) ||
+            h.city.toLowerCase().contains(q) ||
+            h.address.toLowerCase().contains(q);
+        if (!hit) return false;
+      }
+      return f.matches(l);
     }).toList();
 
     switch (tab.value) {
@@ -101,9 +156,8 @@ class StudentDashboardController extends GetxController {
 
       case HomeTab.quick:
         list = list.where((l) => !l.isFull).toList();
-        double price(HostelModel h) =>
-            h.monthlyPrice == 0 ? double.infinity : h.monthlyPrice;
-        list.sort((a, b) => price(a.hostel).compareTo(price(b.hostel)));
+        double price(HostelListing l) => l.displayPrice ?? double.infinity;
+        list.sort((a, b) => price(a).compareTo(price(b)));
         break;
 
       case HomeTab.recent:
@@ -138,8 +192,12 @@ class StudentDashboardController extends GetxController {
     }
   }
 
-  void viewDetails(HostelModel hostel) =>
-      AppSnackbar.info('Hostel details screen is coming next.');
+  void viewDetails(HostelListing listing) {
+    Get.toNamed(
+      AppRoutes.hostelDetails,
+      arguments: HostelDetailsArgs(listing, listings.toList()),
+    );
+  }
 
   void openNotifications() => AppSnackbar.info('No new notifications.');
 

@@ -1,9 +1,11 @@
-import 'package:crib_x/modules/student/widegts/student_drawer.dart';
 import 'package:flutter/material.dart';
 import '../../../core/constant/app_colors.dart';
 import '../../../core/constant/app_sizes.dart';
 import '../../../core/theme/app_text_styles.dart';
+import 'student_drawer.dart';
 
+/// Student ki har screen ka frame: [menu] title ....... [icons]
+/// Menu (hamburger) drawer kholta hai.
 class StudentScaffold extends StatelessWidget {
   final String title;
   final Widget body;
@@ -31,6 +33,13 @@ class StudentScaffold extends StatelessWidget {
                   AppSizes.screenPadding, AppSizes.md, AppSizes.screenPadding, 0),
               child: Row(
                 children: [
+                  Builder(
+                    builder: (ctx) => StudentHeaderIcon(
+                      icon: Icons.menu_rounded,
+                      onTap: () => Scaffold.of(ctx).openDrawer(),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       title,
@@ -38,13 +47,10 @@ class StudentScaffold extends StatelessWidget {
                           .copyWith(fontSize: 22, fontWeight: FontWeight.w700),
                     ),
                   ),
-                  for (final a in actions) ...[a, const SizedBox(width: 8)],
-                  Builder(
-                    builder: (ctx) => StudentHeaderIcon(
-                      icon: Icons.sort_rounded,
-                      onTap: () => Scaffold.of(ctx).openDrawer(),
-                    ),
-                  ),
+                  for (var i = 0; i < actions.length; i++) ...[
+                    if (i > 0) const SizedBox(width: 8),
+                    actions[i],
+                  ],
                 ],
               ),
             ),
@@ -56,11 +62,17 @@ class StudentScaffold extends StatelessWidget {
   }
 }
 
+/// Gol chhota icon. [active] = purple (jaise filter laga ho)
 class StudentHeaderIcon extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
-
-  const StudentHeaderIcon({super.key, required this.icon, required this.onTap});
+  final bool active;
+  const StudentHeaderIcon({
+    super.key,
+    required this.icon,
+    required this.onTap,
+    this.active = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -72,10 +84,11 @@ class StudentHeaderIcon extends StatelessWidget {
         height: 36,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: AppColors.white,
-          border: Border.all(color: AppColors.border),
+          color: active ? AppColors.primary : AppColors.white,
+          border: Border.all(color: active ? AppColors.primary : AppColors.border),
         ),
-        child: Icon(icon, size: 18, color: Colors.black),
+        child: Icon(icon,
+            size: 18, color: active ? AppColors.white : Colors.black),
       ),
     );
   }
