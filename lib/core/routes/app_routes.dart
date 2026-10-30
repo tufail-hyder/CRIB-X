@@ -23,4 +23,5 @@ class AppRoutes {
   static const studentHome = '/student/home';
   static const hostelDetails = '/student/hostel-details';
   static const studentFavorites = '/student/favorites';
+  static const studentProfile = '/student/profile';
 }

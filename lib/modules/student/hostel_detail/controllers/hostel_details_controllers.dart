@@ -12,6 +12,7 @@ import '../../../../data/repositories/auth_repository.dart';
 import '../../../../data/repositories/booking_repository.dart';
 import '../../../../data/repositories/student_home_repository.dart';
 import '../../../../shared/popups/app_snackbar.dart';
+import '../../profile_settings/widgets/student_dialog_widget.dart';
 import '../../widegts/hostel_listing.dart';
 import '../widgets/booking_request_sheet.dart';
 
@@ -30,6 +31,7 @@ class HostelDetailsController extends GetxController {
   final selectedImage = 0.obs;
   final isLoadingRooms = true.obs;
   final isRequesting = false.obs;
+  bool _requestSent = false;
 
   StreamSubscription<Set<String>>? _favSub;
 
@@ -126,7 +128,8 @@ class HostelDetailsController extends GetxController {
       isRequesting.value = false;
     }
 
-    Get.bottomSheet(
+    _requestSent = false;
+    await Get.bottomSheet(
       BookingRequestSheet(
         hostelName: hostel.name,
         rooms: freeRooms,
@@ -138,6 +141,13 @@ class HostelDetailsController extends GetxController {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
     );
+
+    if (_requestSent) {
+      _requestSent = false;
+      await StudentDialogs.success(
+        message: 'Booking request sent to ${hostel.name}',
+      );
+    }
   }
 
   Future<bool> _submitBooking(BookingDraft d) async {
@@ -164,8 +174,7 @@ class HostelDetailsController extends GetxController {
         durationMonths: d.months,
       ));
 
-      AppSnackbar.success(
-          'Request sent to ${hostel.name}. You will be notified once it is approved.');
+      _requestSent = true;
       return true;
     } catch (e, s) {
       AppSnackbar.error(ExceptionHandler.message(e, s));
