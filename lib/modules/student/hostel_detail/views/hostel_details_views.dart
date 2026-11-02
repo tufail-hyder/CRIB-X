@@ -10,6 +10,7 @@ import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/network_image.dart';
 import '../../widegts/hostel_card.dart';
 import '../../widegts/hostel_listing.dart';
+import '../../widegts/student_bell.dart';
 import '../../widegts/student_scaffold.dart';
 import '../controllers/hostel_details_controllers.dart';
 
@@ -32,6 +33,7 @@ class HostelDetailsView extends StatelessWidget {
     return _Body(args: args);
   }
 }
+
 class _Body extends StatefulWidget {
   final HostelDetailsArgs args;
   const _Body({required this.args});
@@ -78,9 +80,7 @@ class _BodyState extends State<_Body> {
                         style: AppTextStyles.screenTitle.copyWith(
                             fontSize: 22, fontWeight: FontWeight.w700)),
                   ),
-                  StudentHeaderIcon(
-                      icon: Icons.notifications_none_rounded,
-                      onTap: c.openNotifications),
+                  const StudentBell(),
                 ],
               ),
             ),

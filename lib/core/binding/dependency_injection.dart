@@ -3,6 +3,7 @@ import '../../data/repositories/auth_repository.dart';
 import '../../data/repositories/booking_repository.dart';
 import '../../data/repositories/complaint_repository.dart';
 import '../../data/repositories/hostel_repository.dart';
+import '../../data/repositories/notification_repository.dart';
 import '../../data/repositories/payment_repository.dart';
 import '../../data/repositories/room_repository.dart'; // <- add
 import '../../data/repositories/setting_repository.dart';
@@ -32,5 +33,6 @@ class DependencyInjection {
     Get.put(SettingsRepository(Get.find<FirestoreService>(), Get.find<CloudinaryService>()), permanent: true,);
     Get.put(StudentHomeRepository(Get.find<FirestoreService>()), permanent: true);
     Get.put(StudentProfileRepository(Get.find<FirestoreService>(), Get.find<CloudinaryService>()), permanent: true,);
+    Get.put(NotificationRepository(Get.find<FirestoreService>()), permanent: true);
   }
 }

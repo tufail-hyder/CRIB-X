@@ -11,6 +11,7 @@ import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/inputs/custom_text_field.dart';
 import '../../../../shared/widgets/network_image.dart';
 import '../../../../shared/widgets/shimmer_loader.dart';
+import '../../widegts/student_bell.dart';
 import '../../widegts/student_scaffold.dart';
 import '../controllers/student_profile_controller.dart';
 
@@ -25,8 +26,7 @@ class StudentProfileView extends GetView<StudentProfileController> {
       title: 'Profile',
       currentRoute: AppRoutes.studentProfile,
       actions: [
-        StudentHeaderIcon(
-            icon: Icons.notifications_none_rounded, onTap: c.openNotifications),
+        const StudentBell(),
       ],
       body: Obx(() {
         if (!c.isLoaded.value) {
@@ -101,7 +101,7 @@ class StudentProfileView extends GetView<StudentProfileController> {
                       label: 'Email',
                       hint: 'Email',
                       controller: c.emailCtrl,
-                      enabled: false, // email yahan se nahi badalta
+                      enabled: false,
                     ),
                     AppSizes.hMd,
                     CustomTextField(

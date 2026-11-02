@@ -8,6 +8,7 @@ import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/inputs/custom_search_bar.dart';
 import '../../../../shared/widgets/shimmer_loader.dart';
 import '../../hostel_detail/widgets/hostel_card.dart';
+import '../../widegts/student_bell.dart';
 import '../../widegts/student_scaffold.dart';
 import '../controllers/favorite_controller.dart';
 
@@ -23,8 +24,7 @@ class FavoritesView extends GetView<FavoritesController> {
       currentRoute: AppRoutes.studentFavorites,
       actions: [
         StudentHeaderIcon(icon: Icons.search_rounded, onTap: c.toggleSearch),
-        StudentHeaderIcon(
-            icon: Icons.notifications_none_rounded, onTap: c.openNotifications),
+        const StudentBell(),
         Obx(() => StudentHeaderIcon(
           icon: Icons.tune_rounded,
           active: c.filter.value.isActive,

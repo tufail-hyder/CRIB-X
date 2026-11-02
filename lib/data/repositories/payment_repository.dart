@@ -1,11 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../core/constant/date_text.dart';
 import '../../core/constant/firebase_constants.dart';
 import '../../core/exceptions/app_exception.dart';
+import '../models/notification_model.dart';
 import '../models/payment_model.dart';
 import '../models/student_model.dart';
 import '../services/firestore_service.dart';
 
-/// Path: hostels/{hostelId}/payments/{paymentId}
 class PaymentRepository {
   final FirestoreService _fs;
   PaymentRepository(this._fs);
@@ -60,6 +61,27 @@ class PaymentRepository {
         if (student.monthlyFee <= 0 && fallbackFee > 0) 'monthlyFee': fallbackFee,
       });
       tx.set(paymentRef, {...p.toJson(), 'createdAt': Timestamp.now()});
+      final studentUid = student.userId;
+      if (studentUid != null) {
+        final parts = p.forMonth.split('-');
+        final y = parts.length == 2 ? int.tryParse(parts[0]) : null;
+        final m = parts.length == 2 ? int.tryParse(parts[1]) : null;
+        final monthName = (y != null && m != null) ? monthText(DateTime(y, m)) : p.forMonth;
+        final left = fee > 0 ? fee - alreadyPaid - p.amount : 0;
+
+        tx.set(
+          _fs.collection('${FirebaseConstants.users}/$studentUid/notifications').doc(),
+          NotificationModel.create(
+            type: NotificationType.payment,
+            title: 'Payment received',
+            body:
+            'Rs ${p.amount.toStringAsFixed(0)} received for $monthName.'
+                '${left > 0.5 ? ' Remaining: Rs ${left.toStringAsFixed(0)}.' : ' Fully paid.'}',
+            senderId: p.hostelId,
+            refId: paymentRef.id,
+          ).toJson(),
+        );
+      }
     });
   }
 

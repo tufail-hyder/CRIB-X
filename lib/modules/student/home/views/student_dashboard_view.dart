@@ -8,7 +8,8 @@ import '../../../../shared/widgets/cards/stat_card.dart';
 import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/inputs/custom_search_bar.dart';
 import '../../../../shared/widgets/shimmer_loader.dart';
-import '../../widegts/hostel_card.dart';
+import '../../hostel_detail/widgets/hostel_card.dart';
+import '../../widegts/student_bell.dart';
 import '../../widegts/student_scaffold.dart';
 import '../controllers/student_dashboard_controller.dart';
 
@@ -24,9 +25,7 @@ class StudentDashboardView extends GetView<StudentDashboardController> {
       currentRoute: AppRoutes.studentHome,
       actions: [
         StudentHeaderIcon(icon: Icons.search_rounded, onTap: c.toggleSearch),
-        StudentHeaderIcon(
-            icon: Icons.notifications_none_rounded, onTap: c.openNotifications),
-        // Filter laga ho to icon purple ho jata hai
+        const StudentBell(),
         Obx(() => StudentHeaderIcon(
           icon: Icons.tune_rounded,
           active: c.filter.value.isActive,

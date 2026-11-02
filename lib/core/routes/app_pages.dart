@@ -33,6 +33,8 @@ import '../../modules/student/favorites/views/favorite_view.dart';
 import '../../modules/student/home/bindings/student_dashboard_binding.dart';
 import '../../modules/student/home/views/student_dashboard_view.dart';
 import '../../modules/student/hostel_detail/views/hostel_details_views.dart';
+import '../../modules/student/notifications/bindings/notification_binding.dart';
+import '../../modules/student/notifications/views/notification_view.dart';
 import '../../modules/student/profile_settings/bindngs/student_profile_binding.dart';
 import '../../modules/student/profile_settings/views/student_profile_view.dart';
 import '../binding/dashboard_binding.dart';
@@ -159,6 +161,16 @@ GetPage(
   name: AppRoutes.studentProfile,
   page: () => const StudentProfileView(),
   binding: StudentProfileBinding(),
+),
+    GetPage(
+  name: AppRoutes.studentNotifications,
+  page: () => const NotificationsView(),
+  binding: StudentNotificationsBinding(),
+),
+GetPage(
+  name: AppRoutes.adminNotifications,
+  page: () => const NotificationsView(),
+  binding: AdminNotificationsBinding(),
 ),
 
     ...adminMenu

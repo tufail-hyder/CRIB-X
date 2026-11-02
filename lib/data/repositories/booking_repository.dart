@@ -1,11 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../core/constant/date_text.dart';
 import '../../core/constant/firebase_constants.dart';
 import '../../core/exceptions/app_exception.dart';
 import '../models/booking_model.dart';
+import '../models/notification_model.dart';
 import '../models/student_model.dart';
 import '../services/firestore_service.dart';
 
-/// Path: hostels/{hostelId}/bookings/{bookingId}
 class BookingRepository {
   final FirestoreService _fs;
   BookingRepository(this._fs);
@@ -22,7 +23,8 @@ class BookingRepository {
         .map((snap) => snap.docs.map(BookingModel.fromSnapshot).toList());
   }
 
-  /// Student ne is hostel me pehle se Pending request to nahi bhej rakhi
+  DocumentReference<Map<String, dynamic>> _userNotif(String uid) =>
+      _fs.collection('${FirebaseConstants.users}/$uid/notifications').doc();
   Future<bool> hasPendingRequest(String hostelId, String userId) async {
     final snap = await _col(hostelId)
         .where('userId', isEqualTo: userId)
@@ -32,12 +34,28 @@ class BookingRepository {
     return snap.docs.isNotEmpty;
   }
 
-  /// Nayi booking hamesha Pending banti hai. Bed tab bharta hai jab approve ho.
-  Future<void> createBooking(BookingModel b) =>
-      _col(b.hostelId).add({...b.toJson(), 'createdAt': Timestamp.now()});
+  Future<void> createBooking(BookingModel b) {
+    final batch = _fs.batch();
+    final bookingRef = _col(b.hostelId).doc();
 
-  /// Approve = bed bharo + student record banao (fee = room ki price) +
-  /// booking approved. Sab ek transaction me.
+    batch.set(bookingRef, {...b.toJson(), 'createdAt': Timestamp.now()});
+
+    if (b.userId != null) {
+      batch.set(
+        _fs.collection('${_base(b.hostelId)}/notifications').doc(),
+        NotificationModel.create(
+          type: NotificationType.booking,
+          title: 'New booking request',
+          body:
+          '${b.studentName} requested Room ${b.roomNumber}, bed ${b.bed} from ${dateText(b.checkInDate)}.',
+          senderId: b.userId!,
+          refId: bookingRef.id,
+        ).toJson(),
+      );
+    }
+    return batch.commit();
+  }
+
   Future<void> approve(BookingModel b) {
     final bookingRef = _col(b.hostelId).doc(b.id);
     final roomRef = _fs.doc('${_base(b.hostelId)}/rooms/${b.roomId}');
@@ -91,6 +109,20 @@ class BookingRepository {
         'studentId': studentRef.id,
         'updatedAt': Timestamp.now(),
       });
+
+      if (b.userId != null) {
+        tx.set(
+          _userNotif(b.userId!),
+          NotificationModel.create(
+            type: NotificationType.booking,
+            title: 'Booking approved',
+            body:
+            'Your request for Room ${b.roomNumber}, bed ${b.bed} was approved. Check-in: ${dateText(b.checkInDate)}.',
+            senderId: b.hostelId,
+            refId: b.id,
+          ).toJson(),
+        );
+      }
     });
   }
 
@@ -106,6 +138,20 @@ class BookingRepository {
         'status': BookingStatus.rejected.name,
         'updatedAt': Timestamp.now(),
       });
+
+      if (b.userId != null) {
+        tx.set(
+          _userNotif(b.userId!),
+          NotificationModel.create(
+            type: NotificationType.booking,
+            title: 'Booking rejected',
+            body:
+            'Your request for Room ${b.roomNumber}, bed ${b.bed} was not accepted. You can try another room or hostel.',
+            senderId: b.hostelId,
+            refId: b.id,
+          ).toJson(),
+        );
+      }
     });
   }
 }
