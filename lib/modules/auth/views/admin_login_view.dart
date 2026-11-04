@@ -85,7 +85,7 @@ class AdminLoginView extends GetView<LoginController> {
                       ),
                     ],
                   ),
-                  AppSizes.hMd,//
+                  AppSizes.hMd,
                   GestureDetector(
                     onTap: () => Get.offAllNamed(AppRoutes.studentLogin),
                     child: Text(
