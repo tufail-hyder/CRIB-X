@@ -18,4 +18,4 @@ Future<void> main() async {
 
   runApp(App(initialRoute: initialRoute));
   FlutterNativeSplash.remove();
-}
+}//
